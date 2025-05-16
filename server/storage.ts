@@ -157,7 +157,7 @@ export class MemStorage implements IStorage {
   }
 
   private initializeSampleData() {
-    // Adicionar um usuário admin
+    // Apenas criando um usuário admin para primeiro acesso
     this.createUser({
       username: "admin",
       password: "admin",
@@ -165,114 +165,9 @@ export class MemStorage implements IStorage {
       cargo: "Gerente",
       email: "admin@lanchefacil.com.br"
     });
-
-    // Adicionar categorias
-    const categorias = [
-      { nome: "Lanches", descricao: "Hamburgueres e sanduíches" },
-      { nome: "Porções", descricao: "Porções e petiscos" },
-      { nome: "Bebidas", descricao: "Bebidas diversas" },
-      { nome: "Sobremesas", descricao: "Sobremesas e doces" },
-      { nome: "Combos", descricao: "Combinações de itens" }
-    ];
-
-    categorias.forEach(categoria => {
-      this.createCategoria(categoria);
-    });
-
-    // Adicionar itens ao cardápio
-    const itensCardapio = [
-      { nome: "Hambúrguer Clássico", descricao: "Pão, carne, queijo, alface, tomate", preco: 19.90, categoriaId: 1, categoria: "Lanches", disponivel: true, imagem: "" },
-      { nome: "X-Bacon", descricao: "Pão, carne, queijo, bacon, alface, tomate", preco: 24.90, categoriaId: 1, categoria: "Lanches", disponivel: true, imagem: "" },
-      { nome: "X-Tudo", descricao: "Pão, carne, queijo, bacon, ovo, presunto, alface, tomate", preco: 29.90, categoriaId: 1, categoria: "Lanches", disponivel: true, imagem: "" },
-      { nome: "Batata Frita P", descricao: "Porção pequena de batata frita", preco: 12.90, categoriaId: 2, categoria: "Porções", disponivel: true, imagem: "" },
-      { nome: "Batata Frita M", descricao: "Porção média de batata frita", preco: 15.90, categoriaId: 2, categoria: "Porções", disponivel: true, imagem: "" },
-      { nome: "Batata Frita G", descricao: "Porção grande de batata frita", preco: 19.90, categoriaId: 2, categoria: "Porções", disponivel: true, imagem: "" },
-      { nome: "Refrigerante Lata", descricao: "Refrigerante em lata 350ml", preco: 5.90, categoriaId: 3, categoria: "Bebidas", disponivel: true, imagem: "" },
-      { nome: "Suco Natural", descricao: "Suco de fruta natural 500ml", preco: 8.90, categoriaId: 3, categoria: "Bebidas", disponivel: true, imagem: "" },
-      { nome: "Milkshake", descricao: "Milkshake de chocolate, morango ou baunilha", preco: 12.90, categoriaId: 4, categoria: "Sobremesas", disponivel: true, imagem: "" },
-      { nome: "Combo Individual", descricao: "Hambúrguer + Batata P + Refrigerante", preco: 32.90, categoriaId: 5, categoria: "Combos", disponivel: true, imagem: "" },
-      { nome: "Combo Família", descricao: "4 Hambúrgueres + 2 Batatas G + 4 Refrigerantes", preco: 89.90, categoriaId: 5, categoria: "Combos", disponivel: true, imagem: "" }
-    ];
-
-    itensCardapio.forEach(item => {
-      this.createItemCardapio(item);
-    });
-
-    // Adicionar mesas
-    for (let i = 1; i <= 9; i++) {
-      const status = i <= 3 ? "ocupada" : i <= 5 ? "reservada" : "livre";
-      this.createMesa({
-        numero: i,
-        capacidade: 4,
-        status,
-        observacoes: ""
-      });
-    }
-
-    // Adicionar itens ao estoque
-    const itensEstoque = [
-      { nome: "Pão de Hambúrguer", descricao: "Pacote com 12 unidades", categoria: "Pães", quantidade: 5, unidade: "unidades", valorUnitario: 8.00, estoqueMinimo: 10, estoqueIdeal: 30 },
-      { nome: "Carne Bovina", descricao: "Carne moída para hambúrguer", categoria: "Carnes", quantidade: 8, unidade: "kg", valorUnitario: 30.00, estoqueMinimo: 5, estoqueIdeal: 15 },
-      { nome: "Queijo Mussarela", descricao: "Fatiado", categoria: "Laticínios", quantidade: 2, unidade: "kg", valorUnitario: 45.00, estoqueMinimo: 3, estoqueIdeal: 10 },
-      { nome: "Alface", descricao: "Alface americana", categoria: "Verduras", quantidade: 4, unidade: "unidades", valorUnitario: 3.50, estoqueMinimo: 5, estoqueIdeal: 15 },
-      { nome: "Tomate", descricao: "Tomate para lanche", categoria: "Legumes", quantidade: 6, unidade: "kg", valorUnitario: 8.00, estoqueMinimo: 3, estoqueIdeal: 10 },
-      { nome: "Bacon", descricao: "Bacon fatiado", categoria: "Carnes", quantidade: 3, unidade: "kg", valorUnitario: 35.00, estoqueMinimo: 2, estoqueIdeal: 8 },
-      { nome: "Batata Frita", descricao: "Batata congelada", categoria: "Congelados", quantidade: 3, unidade: "kg", valorUnitario: 15.00, estoqueMinimo: 5, estoqueIdeal: 20 },
-      { nome: "Refrigerante Cola", descricao: "Lata 350ml", categoria: "Bebidas", quantidade: 8, unidade: "unidades", valorUnitario: 3.00, estoqueMinimo: 12, estoqueIdeal: 48 },
-      { nome: "Ketchup", descricao: "Sachê", categoria: "Condimentos", quantidade: 4, unidade: "caixas", valorUnitario: 25.00, estoqueMinimo: 5, estoqueIdeal: 15 }
-    ];
-
-    itensEstoque.forEach(item => {
-      this.createItemEstoque(item);
-    });
-
-    // Adicionar clientes
-    const clientes = [
-      { nome: "João Silva", email: "joao@email.com", telefone: "(14) 98765-4321", endereco: "Rua A, 123", observacoes: "Cliente frequente" },
-      { nome: "Maria Santos", email: "maria@email.com", telefone: "(14) 91234-5678", endereco: "Rua B, 456", observacoes: "" },
-      { nome: "Pedro Oliveira", email: "pedro@email.com", telefone: "(14) 99876-5432", endereco: "Rua C, 789", observacoes: "Alérgico a camarão" },
-      { nome: "Ana Martinez", email: "ana@email.com", telefone: "(14) 95678-1234", endereco: "Rua D, 101", observacoes: "" },
-      { nome: "Ricardo Almeida", email: "ricardo@email.com", telefone: "(14) 92345-6789", endereco: "Rua E, 202", observacoes: "Prefere sem cebola" }
-    ];
-
-    clientes.forEach(cliente => {
-      this.createCliente(cliente);
-    });
-
-    // Adicionar pedidos
-    const pedidos = [
-      { numero: 1241, tipo: "balcão", mesaId: null, clienteId: 5, nomeCliente: "Paulo Mendes", valorTotal: 42.00, valorDesconto: 0, taxaServico: 0, formaPagamento: "Dinheiro", status: "entregue", observacoes: "" },
-      { numero: 1242, tipo: "balcão", mesaId: null, clienteId: 4, nomeCliente: "Amanda Costa", valorTotal: 27.50, valorDesconto: 0, taxaServico: 0, formaPagamento: "Cartão de Crédito", status: "novo", observacoes: "" },
-      { numero: 1243, tipo: "mesa", mesaId: 3, clienteId: 3, nomeCliente: "Ricardo Almeida", valorTotal: 88.70, valorDesconto: 0, taxaServico: 8.07, formaPagamento: "Cartão de Débito", status: "pago", observacoes: "" },
-      { numero: 1244, tipo: "mesa", mesaId: 2, clienteId: 2, nomeCliente: "Ana Martinez", valorTotal: 54.50, valorDesconto: 0, taxaServico: 4.95, formaPagamento: "PIX", status: "em preparo", observacoes: "" },
-      { numero: 1245, tipo: "balcão", mesaId: null, clienteId: 1, nomeCliente: "João Silva", valorTotal: 32.90, valorDesconto: 0, taxaServico: 0, formaPagamento: "Dinheiro", status: "entregue", observacoes: "" }
-    ];
-
-    pedidos.forEach(pedido => {
-      this.createPedido(pedido);
-    });
-
-    // Adicionar itens aos pedidos
-    // Pedido 1241
-    this.createItemPedido({ pedidoId: 1, itemCardapioId: 11, nome: "Combo Família", preco: 42.00, quantidade: 1, observacoes: "" });
-
-    // Pedido 1242
-    this.createItemPedido({ pedidoId: 2, itemCardapioId: 2, nome: "X-Bacon", preco: 19.90, quantidade: 1, observacoes: "" });
-    this.createItemPedido({ pedidoId: 2, itemCardapioId: 7, nome: "Refrigerante Lata", preco: 7.60, quantidade: 1, observacoes: "" });
-
-    // Pedido 1243
-    this.createItemPedido({ pedidoId: 3, itemCardapioId: 3, nome: "X-Tudo", preco: 29.90, quantidade: 2, observacoes: "" });
-    this.createItemPedido({ pedidoId: 3, itemCardapioId: 6, nome: "Batata Frita G", preco: 19.90, quantidade: 1, observacoes: "" });
-    this.createItemPedido({ pedidoId: 3, itemCardapioId: 8, nome: "Suco Natural", preco: 9.00, quantidade: 1, observacoes: "" });
-
-    // Pedido 1244
-    this.createItemPedido({ pedidoId: 4, itemCardapioId: 10, nome: "Combo Individual", preco: 27.25, quantidade: 2, observacoes: "" });
-
-    // Pedido 1245
-    this.createItemPedido({ pedidoId: 5, itemCardapioId: 10, nome: "Combo Individual", preco: 32.90, quantidade: 1, observacoes: "" });
-
-    // Atualizar contador do número do pedido
-    this.currentPedidoNumero = 1246;
+    
+    // Não inicializar com dados de exemplo
+    // O sistema começará zerado para o primeiro uso
   }
 
   // Implementação de Usuários
