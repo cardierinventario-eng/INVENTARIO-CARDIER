@@ -281,7 +281,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       await storage.createMovimentacaoEstoque({
         itemId: id,
         tipo,
-        quantidade: Math.abs(quantidade),
+        quantidade: Math.abs(quantidade).toString(),
         usuarioId: 1, // Admin por padrão
         motivo: "Ajuste manual",
         produto: itemNome
