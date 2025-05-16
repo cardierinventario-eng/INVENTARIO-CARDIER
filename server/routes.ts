@@ -1,0 +1,447 @@
+import type { Express } from "express";
+import { createServer, type Server } from "http";
+import { storage } from "./storage";
+import { z } from "zod";
+import { 
+  insertClienteSchema, 
+  insertItemCardapioSchema,
+  insertMesaSchema, 
+  insertItemEstoqueSchema,
+  insertMovimentacaoEstoqueSchema,
+  insertPedidoSchema,
+  insertItemPedidoSchema
+} from "@shared/schema";
+
+export async function registerRoutes(app: Express): Promise<Server> {
+  // Rotas da API (prefixadas com /api)
+  
+  // Dashboard
+  app.get("/api/dashboard/stats", async (req, res) => {
+    const stats = await storage.getDashboardStats();
+    res.json(stats);
+  });
+
+  // Clientes
+  app.get("/api/clientes", async (req, res) => {
+    const clientes = await storage.getClientes();
+    res.json(clientes);
+  });
+
+  app.get("/api/clientes/:id", async (req, res) => {
+    const id = parseInt(req.params.id);
+    const cliente = await storage.getCliente(id);
+    
+    if (!cliente) {
+      return res.status(404).json({ message: "Cliente não encontrado" });
+    }
+    
+    res.json(cliente);
+  });
+
+  app.post("/api/clientes", async (req, res) => {
+    try {
+      const data = insertClienteSchema.parse(req.body);
+      const cliente = await storage.createCliente(data);
+      res.status(201).json(cliente);
+    } catch (error) {
+      res.status(400).json({ message: "Dados inválidos", error });
+    }
+  });
+
+  app.patch("/api/clientes/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const data = insertClienteSchema.partial().parse(req.body);
+      const cliente = await storage.updateCliente(id, data);
+      
+      if (!cliente) {
+        return res.status(404).json({ message: "Cliente não encontrado" });
+      }
+      
+      res.json(cliente);
+    } catch (error) {
+      res.status(400).json({ message: "Dados inválidos", error });
+    }
+  });
+
+  app.delete("/api/clientes/:id", async (req, res) => {
+    const id = parseInt(req.params.id);
+    const success = await storage.deleteCliente(id);
+    
+    if (!success) {
+      return res.status(404).json({ message: "Cliente não encontrado" });
+    }
+    
+    res.status(204).end();
+  });
+
+  // Cardápio
+  app.get("/api/cardapio", async (req, res) => {
+    const itens = await storage.getItensCardapio();
+    res.json(itens);
+  });
+
+  app.get("/api/cardapio/:id", async (req, res) => {
+    const id = parseInt(req.params.id);
+    const item = await storage.getItemCardapio(id);
+    
+    if (!item) {
+      return res.status(404).json({ message: "Item não encontrado" });
+    }
+    
+    res.json(item);
+  });
+
+  app.post("/api/cardapio", async (req, res) => {
+    try {
+      const data = insertItemCardapioSchema.parse(req.body);
+      const item = await storage.createItemCardapio(data);
+      res.status(201).json(item);
+    } catch (error) {
+      res.status(400).json({ message: "Dados inválidos", error });
+    }
+  });
+
+  app.patch("/api/cardapio/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const data = insertItemCardapioSchema.partial().parse(req.body);
+      const item = await storage.updateItemCardapio(id, data);
+      
+      if (!item) {
+        return res.status(404).json({ message: "Item não encontrado" });
+      }
+      
+      res.json(item);
+    } catch (error) {
+      res.status(400).json({ message: "Dados inválidos", error });
+    }
+  });
+
+  app.delete("/api/cardapio/:id", async (req, res) => {
+    const id = parseInt(req.params.id);
+    const success = await storage.deleteItemCardapio(id);
+    
+    if (!success) {
+      return res.status(404).json({ message: "Item não encontrado" });
+    }
+    
+    res.status(204).end();
+  });
+
+  // Mesas
+  app.get("/api/mesas", async (req, res) => {
+    const mesas = await storage.getMesas();
+    res.json(mesas);
+  });
+
+  app.get("/api/mesas/:id", async (req, res) => {
+    const id = parseInt(req.params.id);
+    const mesa = await storage.getMesa(id);
+    
+    if (!mesa) {
+      return res.status(404).json({ message: "Mesa não encontrada" });
+    }
+    
+    res.json(mesa);
+  });
+
+  app.post("/api/mesas", async (req, res) => {
+    try {
+      const data = insertMesaSchema.parse(req.body);
+      const mesa = await storage.createMesa(data);
+      res.status(201).json(mesa);
+    } catch (error) {
+      res.status(400).json({ message: "Dados inválidos", error });
+    }
+  });
+
+  app.patch("/api/mesas/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const data = insertMesaSchema.partial().parse(req.body);
+      const mesa = await storage.updateMesa(id, data);
+      
+      if (!mesa) {
+        return res.status(404).json({ message: "Mesa não encontrada" });
+      }
+      
+      res.json(mesa);
+    } catch (error) {
+      res.status(400).json({ message: "Dados inválidos", error });
+    }
+  });
+
+  app.patch("/api/mesas/:id/status", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const statusSchema = z.object({ status: z.string() });
+      const { status } = statusSchema.parse(req.body);
+      
+      const mesa = await storage.updateMesaStatus(id, status);
+      
+      if (!mesa) {
+        return res.status(404).json({ message: "Mesa não encontrada" });
+      }
+      
+      res.json(mesa);
+    } catch (error) {
+      res.status(400).json({ message: "Dados inválidos", error });
+    }
+  });
+
+  app.delete("/api/mesas/:id", async (req, res) => {
+    const id = parseInt(req.params.id);
+    const success = await storage.deleteMesa(id);
+    
+    if (!success) {
+      return res.status(404).json({ message: "Mesa não encontrada" });
+    }
+    
+    res.status(204).end();
+  });
+
+  // Estoque
+  app.get("/api/estoque", async (req, res) => {
+    const itens = await storage.getItensEstoque();
+    res.json(itens);
+  });
+
+  app.get("/api/estoque/baixo", async (req, res) => {
+    const itens = await storage.getItensEstoqueBaixo();
+    res.json(itens);
+  });
+
+  app.get("/api/estoque/:id", async (req, res) => {
+    const id = parseInt(req.params.id);
+    const item = await storage.getItemEstoque(id);
+    
+    if (!item) {
+      return res.status(404).json({ message: "Item não encontrado" });
+    }
+    
+    res.json(item);
+  });
+
+  app.post("/api/estoque", async (req, res) => {
+    try {
+      const data = insertItemEstoqueSchema.parse(req.body);
+      const item = await storage.createItemEstoque(data);
+      res.status(201).json(item);
+    } catch (error) {
+      res.status(400).json({ message: "Dados inválidos", error });
+    }
+  });
+
+  app.patch("/api/estoque/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const data = insertItemEstoqueSchema.partial().parse(req.body);
+      const item = await storage.updateItemEstoque(id, data);
+      
+      if (!item) {
+        return res.status(404).json({ message: "Item não encontrado" });
+      }
+      
+      res.json(item);
+    } catch (error) {
+      res.status(400).json({ message: "Dados inválidos", error });
+    }
+  });
+
+  app.patch("/api/estoque/:id/ajustar", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const schema = z.object({ quantidade: z.number() });
+      const { quantidade } = schema.parse(req.body);
+      
+      const item = await storage.ajustarQuantidadeEstoque(id, quantidade);
+      
+      if (!item) {
+        return res.status(404).json({ message: "Item não encontrado" });
+      }
+      
+      // Registrar movimentação
+      const tipo = quantidade > 0 ? "entrada" : "saida";
+      const itemNome = item.nome;
+      
+      await storage.createMovimentacaoEstoque({
+        itemId: id,
+        tipo,
+        quantidade: Math.abs(quantidade),
+        usuarioId: 1, // Admin por padrão
+        motivo: "Ajuste manual",
+        produto: itemNome
+      });
+      
+      res.json(item);
+    } catch (error) {
+      res.status(400).json({ message: "Dados inválidos", error });
+    }
+  });
+
+  app.delete("/api/estoque/:id", async (req, res) => {
+    const id = parseInt(req.params.id);
+    const success = await storage.deleteItemEstoque(id);
+    
+    if (!success) {
+      return res.status(404).json({ message: "Item não encontrado" });
+    }
+    
+    res.status(204).end();
+  });
+
+  app.post("/api/estoque/movimentacao", async (req, res) => {
+    try {
+      const data = insertMovimentacaoEstoqueSchema.parse(req.body);
+      const movimentacao = await storage.createMovimentacaoEstoque(data);
+      res.status(201).json(movimentacao);
+    } catch (error) {
+      res.status(400).json({ message: "Dados inválidos", error });
+    }
+  });
+
+  app.get("/api/estoque/movimentacao", async (req, res) => {
+    const movimentacoes = await storage.getMovimentacoesEstoque();
+    res.json(movimentacoes);
+  });
+
+  // Pedidos
+  app.get("/api/pedidos", async (req, res) => {
+    const pedidos = await storage.getPedidos();
+    res.json(pedidos);
+  });
+
+  app.get("/api/pedidos/recentes", async (req, res) => {
+    const pedidos = await storage.getPedidosRecentes();
+    res.json(pedidos);
+  });
+
+  app.get("/api/pedidos/:id", async (req, res) => {
+    const id = parseInt(req.params.id);
+    const pedido = await storage.getPedido(id);
+    
+    if (!pedido) {
+      return res.status(404).json({ message: "Pedido não encontrado" });
+    }
+    
+    res.json(pedido);
+  });
+
+  app.get("/api/pedidos/:id/itens", async (req, res) => {
+    const id = parseInt(req.params.id);
+    const itens = await storage.getItensPedido(id);
+    res.json(itens);
+  });
+
+  app.post("/api/pedidos", async (req, res) => {
+    try {
+      const data = insertPedidoSchema.parse(req.body);
+      const pedido = await storage.createPedido(data);
+      res.status(201).json(pedido);
+    } catch (error) {
+      res.status(400).json({ message: "Dados inválidos", error });
+    }
+  });
+
+  app.patch("/api/pedidos/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const data = insertPedidoSchema.partial().parse(req.body);
+      const pedido = await storage.updatePedido(id, data);
+      
+      if (!pedido) {
+        return res.status(404).json({ message: "Pedido não encontrado" });
+      }
+      
+      res.json(pedido);
+    } catch (error) {
+      res.status(400).json({ message: "Dados inválidos", error });
+    }
+  });
+
+  app.patch("/api/pedidos/:id/status", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const statusSchema = z.object({ status: z.string() });
+      const { status } = statusSchema.parse(req.body);
+      
+      const pedido = await storage.updatePedidoStatus(id, status);
+      
+      if (!pedido) {
+        return res.status(404).json({ message: "Pedido não encontrado" });
+      }
+      
+      res.json(pedido);
+    } catch (error) {
+      res.status(400).json({ message: "Dados inválidos", error });
+    }
+  });
+
+  app.delete("/api/pedidos/:id", async (req, res) => {
+    const id = parseInt(req.params.id);
+    const success = await storage.deletePedido(id);
+    
+    if (!success) {
+      return res.status(404).json({ message: "Pedido não encontrado" });
+    }
+    
+    res.status(204).end();
+  });
+
+  app.post("/api/pedidos/:id/itens", async (req, res) => {
+    try {
+      const pedidoId = parseInt(req.params.id);
+      const data = insertItemPedidoSchema.parse({ ...req.body, pedidoId });
+      const item = await storage.createItemPedido(data);
+      res.status(201).json(item);
+    } catch (error) {
+      res.status(400).json({ message: "Dados inválidos", error });
+    }
+  });
+
+  app.delete("/api/pedidos/itens/:id", async (req, res) => {
+    const id = parseInt(req.params.id);
+    const success = await storage.deleteItemPedido(id);
+    
+    if (!success) {
+      return res.status(404).json({ message: "Item não encontrado" });
+    }
+    
+    res.status(204).end();
+  });
+
+  // Relatórios
+  app.get("/api/relatorios/vendas", async (req, res) => {
+    const relatorio = await storage.getRelatorioVendas();
+    res.json(relatorio);
+  });
+
+  app.get("/api/relatorios/financeiro", async (req, res) => {
+    const relatorio = await storage.getRelatorioFinanceiro();
+    res.json(relatorio);
+  });
+
+  app.get("/api/relatorios/estoque", async (req, res) => {
+    const relatorio = await storage.getRelatorioEstoque();
+    res.json(relatorio);
+  });
+
+  // Configurações
+  app.get("/api/configuracoes", async (req, res) => {
+    const config = await storage.getConfiguracao();
+    res.json(config);
+  });
+
+  app.patch("/api/configuracoes", async (req, res) => {
+    try {
+      const config = await storage.updateConfiguracao(req.body);
+      res.json(config);
+    } catch (error) {
+      res.status(400).json({ message: "Dados inválidos", error });
+    }
+  });
+
+  const httpServer = createServer(app);
+  return httpServer;
+}

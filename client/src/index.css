@@ -1,0 +1,112 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@400;500;600;700&display=swap');
+@import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 20 14.3% 4.1%;
+    --muted: 60 4.8% 95.9%;
+    --muted-foreground: 25 5.3% 44.7%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 20 14.3% 4.1%;
+    --card: 0 0% 100%;
+    --card-foreground: 20 14.3% 4.1%;
+    --border: 20 5.9% 90%;
+    --input: 20 5.9% 90%;
+    
+    /* Cores inspiradas nos Lençóis Maranhenses */
+    --primary: 200 90% 36%; /* #0077b6 - Azul oceano */
+    --primary-light: 195 100% 39%; /* #0096c7 */
+    --primary-dark: 210 97% 28%; /* #023e8a */
+    
+    --secondary: 190 100% 42%; /* #00b4d8 */
+    --secondary-light: 190 84% 59%; /* #48cae4 */
+    --secondary-dark: 195 100% 39%; /* #0096c7 */
+    
+    --primary-foreground: 211 100% 99%; /* branco azulado */
+    --secondary-foreground: 24 9.8% 10%;
+    
+    --accent: 43 100% 70%; /* #ffd166 - Areia dourada */
+    --accent-light: 43 100% 77%; /* #ffe08a */
+    --accent-dark: 38 100% 63%; /* #ffbc42 */
+    
+    --accent-foreground: 24 9.8% 10%;
+    
+    --destructive: 0 84.2% 60.2%; /* #e74c3c */
+    --destructive-foreground: 60 9.1% 97.8%;
+    
+    --success: 145 63% 49%; /* #2ecc71 */
+    --warning: 37 100% 51%; /* #f39c12 */
+    --info: 204 70% 53%; /* #3498db */
+    
+    --neutral-lightest: 0 0% 98%; /* #f8f9fa */
+    --neutral-light: 210 16% 93%; /* #e9ecef */
+    --neutral-medium: 210 14% 83%; /* #ced4da */
+    --neutral-dark: 210 9% 45%; /* #6c757d */
+    --neutral-darkest: 210 10% 23%; /* #343a40 */
+    
+    --ring: 20 14.3% 4.1%;
+    --radius: 0.5rem;
+  }
+  
+  .dark {
+    --background: 240 10% 3.9%;
+    --foreground: 0 0% 98%;
+    --muted: 240 3.7% 15.9%;
+    --muted-foreground: 240 5% 64.9%;
+    --popover: 240 10% 3.9%;
+    --popover-foreground: 0 0% 98%;
+    --card: 240 10% 3.9%;
+    --card-foreground: 0 0% 98%;
+    --border: 240 3.7% 15.9%;
+    --input: 240 3.7% 15.9%;
+    
+    --primary: 200 90% 36%;
+    --primary-foreground: 211 100% 99%;
+    
+    --secondary: 190 100% 42%;
+    --secondary-foreground: 0 0% 98%;
+    
+    --accent: 43 100% 70%;
+    --accent-foreground: 0 0% 98%;
+    
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 0 0% 98%;
+    
+    --ring: 240 4.9% 83.9%;
+    --radius: 0.5rem;
+  }
+  
+  * {
+    @apply border-border;
+  }
+  
+  body {
+    @apply font-sans antialiased bg-neutral-lightest text-foreground;
+  }
+  
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+  
+  ::-webkit-scrollbar-track {
+    @apply bg-neutral-light;
+  }
+  
+  ::-webkit-scrollbar-thumb {
+    @apply bg-primary rounded-md;
+  }
+  
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-primary-dark;
+  }
+  
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-heading;
+  }
+}
