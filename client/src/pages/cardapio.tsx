@@ -27,6 +27,7 @@ import {
 } from "lucide-react";
 import { formatCurrency } from "@/lib/utils";
 import { Skeleton } from "@/components/ui/skeleton";
+import { NovoItemDialog } from "@/components/cardapio/novo-item-dialog";
 import { type ItemCardapio } from "@shared/schema";
 
 export default function Cardapio() {
@@ -39,14 +40,15 @@ export default function Cardapio() {
 
   // Obter categorias únicas para o menu
   const categorias = itensCardapio 
-    ? [...new Set(itensCardapio.map(item => item.categoria))]
+    ? Array.from(new Set(itensCardapio.map(item => item.categoria)))
     : [];
 
   // Filtrar itens por texto e/ou categoria
   const itensFiltrados = itensCardapio?.filter(item => {
     // Filtro por texto
-    const textoMatch = item.nome.toLowerCase().includes(filtro.toLowerCase()) ||
-                      item.descricao.toLowerCase().includes(filtro.toLowerCase());
+    const textoMatch = !filtro || 
+                      (item.nome?.toLowerCase().includes(filtro.toLowerCase()) ||
+                      (item.descricao && item.descricao.toLowerCase().includes(filtro.toLowerCase())));
     
     // Filtro por categoria
     const categoriaMatch = categoriaAtiva === "todos" || 
@@ -62,9 +64,7 @@ export default function Cardapio() {
           <h1 className="text-2xl font-heading font-bold text-neutral-darkest">Cardápio</h1>
           <p className="text-neutral-dark">Gerencie os itens do cardápio do seu restaurante</p>
         </div>
-        <Button className="bg-primary hover:bg-primary-dark text-white">
-          <Plus className="mr-2 h-4 w-4" /> Novo Item
-        </Button>
+        <NovoItemDialog categorias={categorias} />
       </div>
       
       <Tabs defaultValue="todos" className="mb-6">
@@ -142,7 +142,7 @@ export default function Cardapio() {
                   </CardHeader>
                   <CardContent className="pb-2">
                     <p className="font-bold text-primary text-lg">
-                      {formatCurrency(item.preco)}
+                      {formatCurrency(parseFloat(String(item.preco)))}
                     </p>
                   </CardContent>
                   <CardFooter className="pt-2 justify-between">
@@ -169,7 +169,11 @@ export default function Cardapio() {
               ))
             ) : (
               <div className="col-span-full text-center py-10 text-neutral-dark">
-                Nenhum item encontrado com os filtros selecionados
+                {filtro || categoriaAtiva !== "todos" ? (
+                  "Nenhum item encontrado com os filtros selecionados"
+                ) : (
+                  "Nenhum item cadastrado no cardápio. Clique em 'Novo Item' para adicionar."
+                )}
               </div>
             )}
           </div>

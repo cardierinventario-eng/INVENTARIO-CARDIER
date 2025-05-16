@@ -94,10 +94,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post("/api/cardapio", async (req, res) => {
     try {
+      // Converter preço para número se vier como string
+      if (typeof req.body.preco === 'string') {
+        req.body.preco = parseFloat(req.body.preco.replace(',', '.'));
+      }
+      
       const data = insertItemCardapioSchema.parse(req.body);
       const item = await storage.createItemCardapio(data);
       res.status(201).json(item);
     } catch (error) {
+      console.error("Erro ao criar item do cardápio:", error);
       res.status(400).json({ message: "Dados inválidos", error });
     }
   });
@@ -105,6 +111,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.patch("/api/cardapio/:id", async (req, res) => {
     try {
       const id = parseInt(req.params.id);
+      
+      // Converter preço para número se vier como string
+      if (typeof req.body.preco === 'string') {
+        req.body.preco = parseFloat(req.body.preco.replace(',', '.'));
+      }
+      
       const data = insertItemCardapioSchema.partial().parse(req.body);
       const item = await storage.updateItemCardapio(id, data);
       
@@ -114,6 +126,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       res.json(item);
     } catch (error) {
+      console.error("Erro ao atualizar item do cardápio:", error);
       res.status(400).json({ message: "Dados inválidos", error });
     }
   });
