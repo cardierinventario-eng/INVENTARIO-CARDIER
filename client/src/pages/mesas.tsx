@@ -290,6 +290,18 @@ export default function Mesas() {
           </DialogContent>
         </Dialog>
       )}
+      
+      {/* Diálogo para adicionar produtos à mesa */}
+      {mesaSelecionadaProdutos && (
+        <AdicionarProdutosDialog
+          mesa={mesaSelecionadaProdutos}
+          aberto={produtosDialogAberto}
+          aoFechar={() => {
+            setProdutosDialogAberto(false);
+            setMesaSelecionadaProdutos(null);
+          }}
+        />
+      )}
     </>
   );
 }
