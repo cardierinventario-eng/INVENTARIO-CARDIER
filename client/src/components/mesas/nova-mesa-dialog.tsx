@@ -29,8 +29,8 @@ import { Plus } from "lucide-react";
 
 // Schema de validação
 const formSchema = z.object({
-  numero: z.string().min(1, "Número da mesa é obrigatório").transform(Number),
-  capacidade: z.string().min(1, "Capacidade é obrigatória").transform(Number),
+  numero: z.coerce.number().min(1, "Número da mesa é obrigatório"),
+  capacidade: z.coerce.number().min(1, "Capacidade é obrigatória"),
   localizacao: z.string().optional(),
 });
 
@@ -45,8 +45,8 @@ export function NovaMesaDialog() {
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      numero: "",
-      capacidade: "",
+      numero: 0,
+      capacidade: 0,
       localizacao: "",
     },
   });
