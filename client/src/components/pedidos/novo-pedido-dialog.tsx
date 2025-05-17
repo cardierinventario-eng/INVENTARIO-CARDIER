@@ -50,6 +50,7 @@ import {
   Minus,
   Trash2,
   ShoppingCart,
+  Printer,
   CreditCard
 } from "lucide-react";
 
@@ -83,6 +84,8 @@ export function NovoPedidoDialog({ open = false, onOpenChange }: NovoPedidoDialo
   const [isOpen, setIsOpen] = useState(open);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [itensSelecionados, setItensSelecionados] = useState<ItemPedido[]>([]);
+  const [pedidoCriado, setPedidoCriado] = useState<any>(null);
+  
   const queryClient = useQueryClient();
   const { toast } = useToast();
 
@@ -139,6 +142,7 @@ export function NovoPedidoDialog({ open = false, onOpenChange }: NovoPedidoDialo
     if (!isOpen) {
       form.reset();
       setItensSelecionados([]);
+      setPedidoCriado(null);
     }
   }, [isOpen, form]);
 
@@ -200,6 +204,158 @@ export function NovoPedidoDialog({ open = false, onOpenChange }: NovoPedidoDialo
     const preco = typeof item.preco === 'string' ? parseFloat(item.preco) : item.preco;
     return total + (preco * item.quantidade);
   }, 0);
+
+  // Imprimir pedido
+  const imprimirPedido = () => {
+    if (!pedidoCriado) return;
+    
+    // Criar um elemento temporário para armazenar o conteúdo para impressão
+    const printWindow = window.open('', '_blank');
+    if (!printWindow) {
+      toast({
+        title: "Erro",
+        description: "Não foi possível abrir a janela de impressão. Verifique se os pop-ups estão permitidos.",
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    // Estilo para impressão
+    const style = `
+      <style>
+        body { font-family: Arial, sans-serif; margin: 0; padding: 20px; }
+        .header { text-align: center; margin-bottom: 20px; border-bottom: 1px solid #ccc; padding-bottom: 10px; }
+        .titulo { font-size: 18px; font-weight: bold; margin-bottom: 5px; }
+        .subtitulo { font-size: 14px; margin-bottom: 5px; }
+        .info-row { display: flex; margin-bottom: 5px; }
+        .info-label { font-weight: bold; width: 120px; }
+        .info-value { flex: 1; }
+        .tabela { width: 100%; border-collapse: collapse; margin: 15px 0; }
+        .tabela th, .tabela td { border-bottom: 1px solid #eee; padding: 8px; text-align: left; }
+        .tabela th { font-weight: bold; border-bottom: 2px solid #ddd; }
+        .total-row { font-weight: bold; margin-top: 15px; text-align: right; }
+        .observacoes { margin-top: 20px; }
+        .observacoes-titulo { font-weight: bold; margin-bottom: 5px; }
+        .footer { margin-top: 30px; text-align: center; font-size: 12px; border-top: 1px solid #ccc; padding-top: 10px; }
+      </style>
+    `;
+    
+    // Conteúdo do recibo
+    const formaPagamentoTexto = 
+      pedidoCriado.formaPagamento === 'dinheiro' ? 'Dinheiro' :
+      pedidoCriado.formaPagamento === 'cartao_credito' ? 'Cartão de Crédito' :
+      pedidoCriado.formaPagamento === 'cartao_debito' ? 'Cartão de Débito' :
+      pedidoCriado.formaPagamento === 'pix' ? 'PIX' : pedidoCriado.formaPagamento;
+    
+    let tipoTexto = 'Balcão';
+    if (pedidoCriado.tipo === 'mesa') {
+      const mesa = mesas.find(m => m.id === pedidoCriado.mesaId);
+      tipoTexto = `Mesa ${mesa?.numero || ''}`;
+    } else if (pedidoCriado.tipo === 'delivery') {
+      tipoTexto = 'Delivery';
+    }
+    
+    const dataFormatada = new Date(pedidoCriado.data).toLocaleString('pt-BR');
+    
+    // Itens do pedido
+    let itensHtml = '';
+    itensSelecionados.forEach(item => {
+      const precoUnitario = typeof item.preco === 'string' ? parseFloat(item.preco) : item.preco;
+      const precoTotal = precoUnitario * item.quantidade;
+      itensHtml += `
+        <tr>
+          <td>${item.nome}</td>
+          <td style="text-align: center">${item.quantidade}</td>
+          <td style="text-align: right">R$ ${precoUnitario.toFixed(2)}</td>
+          <td style="text-align: right">R$ ${precoTotal.toFixed(2)}</td>
+        </tr>
+      `;
+    });
+    
+    const content = `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <title>Pedido #${pedidoCriado.numero}</title>
+        ${style}
+      </head>
+      <body>
+        <div class="header">
+          <div class="titulo">LANCHE FÁCIL</div>
+          <div class="subtitulo">COMPROVANTE DE PEDIDO</div>
+        </div>
+        
+        <div class="info-row">
+          <div class="info-label">Número:</div>
+          <div class="info-value">${pedidoCriado.numero}</div>
+        </div>
+        
+        <div class="info-row">
+          <div class="info-label">Data/Hora:</div>
+          <div class="info-value">${dataFormatada}</div>
+        </div>
+        
+        <div class="info-row">
+          <div class="info-label">Tipo:</div>
+          <div class="info-value">${tipoTexto}</div>
+        </div>
+        
+        ${pedidoCriado.nomeCliente ? `
+        <div class="info-row">
+          <div class="info-label">Cliente:</div>
+          <div class="info-value">${pedidoCriado.nomeCliente}</div>
+        </div>
+        ` : ''}
+        
+        <div class="info-row">
+          <div class="info-label">Pagamento:</div>
+          <div class="info-value">${formaPagamentoTexto}</div>
+        </div>
+        
+        <table class="tabela">
+          <thead>
+            <tr>
+              <th>Item</th>
+              <th style="text-align: center">Qtd</th>
+              <th style="text-align: right">Preço</th>
+              <th style="text-align: right">Total</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${itensHtml}
+          </tbody>
+        </table>
+        
+        <div class="total-row">
+          TOTAL: R$ ${valorTotal.toFixed(2)}
+        </div>
+        
+        ${pedidoCriado.observacoes ? `
+        <div class="observacoes">
+          <div class="observacoes-titulo">Observações:</div>
+          <div>${pedidoCriado.observacoes}</div>
+        </div>
+        ` : ''}
+        
+        <div class="footer">
+          Agradecemos pela preferência!<br>
+          LANCHE FÁCIL - Seu restaurante completo
+        </div>
+      </body>
+      </html>
+    `;
+    
+    printWindow.document.open();
+    printWindow.document.write(content);
+    printWindow.document.close();
+    
+    // Pequeno atraso para garantir que o conteúdo seja carregado
+    setTimeout(() => {
+      printWindow.print();
+      // Após impressão, fechar a janela
+      printWindow.close();
+    }, 500);
+  };
 
   const onSubmit = async (data: FormValues) => {
     if (itensSelecionados.length === 0) {
@@ -273,8 +429,14 @@ export function NovoPedidoDialog({ open = false, onOpenChange }: NovoPedidoDialo
       queryClient.invalidateQueries({ queryKey: ['/api/dashboard/stats'] });
       queryClient.invalidateQueries({ queryKey: ['/api/mesas'] });
       
-      // Fechar modal e resetar form
-      setIsOpen(false);
+      // Guardar o pedido criado para impressão
+      setPedidoCriado({...pedidoCriado, ...novoPedido});
+      
+      // Iniciar processo de impressão automaticamente
+      setTimeout(() => {
+        imprimirPedido();
+      }, 1000);
+      
     } catch (error) {
       console.error("Erro ao criar pedido:", error);
       toast({
@@ -302,235 +464,266 @@ export function NovoPedidoDialog({ open = false, onOpenChange }: NovoPedidoDialo
           </DialogDescription>
         </DialogHeader>
         
-        <div className="grid grid-cols-1 md:grid-cols-12 gap-4">
-          {/* Seletor de itens */}
-          <div className="md:col-span-5 border rounded-md p-4 h-[300px] overflow-y-auto">
-            <h3 className="font-semibold mb-2">Itens do Cardápio</h3>
-            <div className="space-y-2">
-              {itensCardapio.filter((item: any) => item.disponivel).map((item: any) => (
-                <div key={item.id} className="flex justify-between items-center border-b pb-2">
-                  <div>
-                    <p className="font-medium">{item.nome}</p>
-                    <p className="text-sm text-muted-foreground">R$ {typeof item.preco === 'number' ? item.preco.toFixed(2) : item.preco}</p>
-                  </div>
-                  <Button 
-                    variant="ghost" 
-                    size="sm" 
-                    onClick={() => adicionarItem(item)}
-                  >
-                    <Plus className="h-4 w-4" />
-                  </Button>
-                </div>
-              ))}
+        {pedidoCriado ? (
+          // Exibir tela de confirmação com opção de impressão quando o pedido for criado
+          <div className="flex flex-col items-center justify-center py-8">
+            <div className="text-center mb-6">
+              <div className="text-2xl font-bold mb-2 text-primary">Pedido Criado!</div>
+              <p className="text-muted-foreground">Pedido #{pedidoCriado.numero} foi registrado com sucesso.</p>
             </div>
+            
+            <Button 
+              onClick={imprimirPedido} 
+              className="mb-4 bg-primary hover:bg-primary-dark text-white"
+            >
+              <Printer className="mr-2 h-4 w-4" /> Imprimir Comprovante
+            </Button>
+            
+            <Button 
+              variant="outline" 
+              onClick={() => {
+                setIsOpen(false);
+                // Garantir que o estado seja resetado para o próximo uso
+                setTimeout(() => setPedidoCriado(null), 500);
+              }}
+            >
+              Fechar
+            </Button>
           </div>
-          
-          {/* Resumo do pedido */}
-          <div className="md:col-span-7 border rounded-md p-4 h-[300px] flex flex-col">
-            <h3 className="font-semibold mb-2">Itens do Pedido</h3>
-            <div className="flex-grow overflow-y-auto">
-              {itensSelecionados.length === 0 ? (
-                <div className="text-center py-8 text-muted-foreground">
-                  <ShoppingCart className="mx-auto h-10 w-10 mb-2 opacity-30" />
-                  <p>Selecione itens do cardápio para adicionar ao pedido</p>
-                </div>
-              ) : (
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Item</TableHead>
-                      <TableHead className="text-center">Qtd</TableHead>
-                      <TableHead className="text-right">Valor</TableHead>
-                      <TableHead className="w-10"></TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {itensSelecionados.map((item) => (
-                      <TableRow key={item.id}>
-                        <TableCell className="font-medium">{item.nome}</TableCell>
-                        <TableCell className="text-center">
-                          <div className="flex items-center justify-center">
-                            <Button 
-                              variant="ghost" 
-                              size="sm"
-                              className="h-7 w-7 p-0" 
-                              onClick={() => diminuirQuantidade(item.id)}
-                            >
-                              <Minus className="h-3 w-3" />
-                            </Button>
-                            <span className="mx-2">{item.quantidade}</span>
-                            <Button 
-                              variant="ghost" 
-                              size="sm"
-                              className="h-7 w-7 p-0" 
-                              onClick={() => aumentarQuantidade(item.id)}
-                            >
-                              <Plus className="h-3 w-3" />
-                            </Button>
-                          </div>
-                        </TableCell>
-                        <TableCell className="text-right">
-                          R$ {(parseFloat(item.preco.toString()) * item.quantidade).toFixed(2)}
-                        </TableCell>
-                        <TableCell>
-                          <Button 
-                            variant="ghost" 
-                            size="sm"
-                            className="h-7 w-7 p-0 text-destructive" 
-                            onClick={() => removerItem(item.id)}
-                          >
-                            <Trash2 className="h-4 w-4" />
-                          </Button>
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              )}
-            </div>
-            <Separator className="my-2" />
-            <div className="flex justify-between font-semibold">
-              <span>Total:</span>
-              <span>R$ {valorTotal.toFixed(2)}</span>
-            </div>
-          </div>
-        </div>
-        
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <FormField
-                control={form.control}
-                name="tipo"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Tipo de Pedido*</FormLabel>
-                    <Select 
-                      onValueChange={field.onChange} 
-                      defaultValue={field.value}
-                    >
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Selecione o tipo" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        <SelectItem value="balcao">Balcão</SelectItem>
-                        <SelectItem value="mesa">Mesa</SelectItem>
-                        <SelectItem value="delivery">Delivery</SelectItem>
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              
-              {form.watch("tipo") === "mesa" && (
-                <FormField
-                  control={form.control}
-                  name="mesaId"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Mesa*</FormLabel>
-                      <Select 
-                        onValueChange={(value) => field.onChange(parseInt(value))} 
-                        defaultValue={field.value?.toString()}
+        ) : (
+          // Formulário de criação de pedido
+          <>
+            <div className="grid grid-cols-1 md:grid-cols-12 gap-4">
+              {/* Seletor de itens */}
+              <div className="md:col-span-5 border rounded-md p-4 h-[300px] overflow-y-auto">
+                <h3 className="font-semibold mb-2">Itens do Cardápio</h3>
+                <div className="space-y-2">
+                  {itensCardapio.filter((item: any) => item.disponivel).map((item: any) => (
+                    <div key={item.id} className="flex justify-between items-center border-b pb-2">
+                      <div>
+                        <p className="font-medium">{item.nome}</p>
+                        <p className="text-sm text-muted-foreground">R$ {typeof item.preco === 'number' ? item.preco.toFixed(2) : item.preco}</p>
+                      </div>
+                      <Button 
+                        variant="ghost" 
+                        size="sm" 
+                        onClick={() => adicionarItem(item)}
                       >
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Selecione a mesa" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          {mesasDisponiveis.map((mesa: any) => (
-                            <SelectItem key={mesa.id} value={mesa.id.toString()}>
-                              Mesa {mesa.numero} - {mesa.capacidade} lugares
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
+                        <Plus className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+              
+              {/* Resumo do pedido */}
+              <div className="md:col-span-7 border rounded-md p-4 h-[300px] flex flex-col">
+                <h3 className="font-semibold mb-2">Itens do Pedido</h3>
+                <div className="flex-grow overflow-y-auto">
+                  {itensSelecionados.length === 0 ? (
+                    <div className="text-center py-8 text-muted-foreground">
+                      <ShoppingCart className="mx-auto h-10 w-10 mb-2 opacity-30" />
+                      <p>Selecione itens do cardápio para adicionar ao pedido</p>
+                    </div>
+                  ) : (
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead>Item</TableHead>
+                          <TableHead className="text-center">Qtd</TableHead>
+                          <TableHead className="text-right">Valor</TableHead>
+                          <TableHead className="w-10"></TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {itensSelecionados.map((item) => (
+                          <TableRow key={item.id}>
+                            <TableCell className="font-medium">{item.nome}</TableCell>
+                            <TableCell className="text-center">
+                              <div className="flex items-center justify-center">
+                                <Button 
+                                  variant="ghost" 
+                                  size="sm"
+                                  className="h-7 w-7 p-0" 
+                                  onClick={() => diminuirQuantidade(item.id)}
+                                >
+                                  <Minus className="h-3 w-3" />
+                                </Button>
+                                <span className="mx-2">{item.quantidade}</span>
+                                <Button 
+                                  variant="ghost" 
+                                  size="sm"
+                                  className="h-7 w-7 p-0" 
+                                  onClick={() => aumentarQuantidade(item.id)}
+                                >
+                                  <Plus className="h-3 w-3" />
+                                </Button>
+                              </div>
+                            </TableCell>
+                            <TableCell className="text-right">
+                              R$ {(parseFloat(item.preco.toString()) * item.quantidade).toFixed(2)}
+                            </TableCell>
+                            <TableCell>
+                              <Button 
+                                variant="ghost" 
+                                size="sm"
+                                className="h-7 w-7 p-0 text-destructive" 
+                                onClick={() => removerItem(item.id)}
+                              >
+                                <Trash2 className="h-4 w-4" />
+                              </Button>
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
                   )}
-                />
-              )}
-              
-              <FormField
-                control={form.control}
-                name="nomeCliente"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Cliente</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Nome do cliente" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              
-              <FormField
-                control={form.control}
-                name="formaPagamento"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Forma de Pagamento</FormLabel>
-                    <Select 
-                      onValueChange={field.onChange} 
-                      defaultValue={field.value}
-                    >
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Selecione a forma de pagamento" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        <SelectItem value="dinheiro">Dinheiro</SelectItem>
-                        <SelectItem value="cartao_credito">Cartão de Crédito</SelectItem>
-                        <SelectItem value="cartao_debito">Cartão de Débito</SelectItem>
-                        <SelectItem value="pix">PIX</SelectItem>
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              
-              <div className="md:col-span-2">
-                <FormField
-                  control={form.control}
-                  name="observacoes"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Observações</FormLabel>
-                      <FormControl>
-                        <Textarea 
-                          placeholder="Observações sobre o pedido" 
-                          className="resize-none" 
-                          {...field} 
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+                </div>
+                <Separator className="my-2" />
+                <div className="flex justify-between font-semibold">
+                  <span>Total:</span>
+                  <span>R$ {valorTotal.toFixed(2)}</span>
+                </div>
               </div>
             </div>
             
-            <DialogFooter>
-              <Button type="button" variant="outline" onClick={() => setIsOpen(false)}>
-                Cancelar
-              </Button>
-              <Button 
-                type="submit" 
-                disabled={isSubmitting || itensSelecionados.length === 0}
-                className="bg-primary hover:bg-primary-dark text-white"
-              >
-                {isSubmitting ? "Enviando..." : "Criar Pedido"}
-              </Button>
-            </DialogFooter>
-          </form>
-        </Form>
+            <Form {...form}>
+              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <FormField
+                    control={form.control}
+                    name="tipo"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Tipo de Pedido*</FormLabel>
+                        <Select 
+                          onValueChange={field.onChange} 
+                          defaultValue={field.value}
+                        >
+                          <FormControl>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Selecione o tipo" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            <SelectItem value="balcao">Balcão</SelectItem>
+                            <SelectItem value="mesa">Mesa</SelectItem>
+                            <SelectItem value="delivery">Delivery</SelectItem>
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  
+                  {form.watch("tipo") === "mesa" && (
+                    <FormField
+                      control={form.control}
+                      name="mesaId"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Mesa*</FormLabel>
+                          <Select 
+                            onValueChange={(value) => field.onChange(parseInt(value))} 
+                            defaultValue={field.value?.toString()}
+                          >
+                            <FormControl>
+                              <SelectTrigger>
+                                <SelectValue placeholder="Selecione a mesa" />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                              {mesasDisponiveis.map((mesa: any) => (
+                                <SelectItem key={mesa.id} value={mesa.id.toString()}>
+                                  Mesa {mesa.numero} - {mesa.capacidade} lugares
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  )}
+                  
+                  <FormField
+                    control={form.control}
+                    name="nomeCliente"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Cliente</FormLabel>
+                        <FormControl>
+                          <Input placeholder="Nome do cliente" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  
+                  <FormField
+                    control={form.control}
+                    name="formaPagamento"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Forma de Pagamento</FormLabel>
+                        <Select 
+                          onValueChange={field.onChange} 
+                          defaultValue={field.value}
+                        >
+                          <FormControl>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Selecione a forma de pagamento" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            <SelectItem value="dinheiro">Dinheiro</SelectItem>
+                            <SelectItem value="cartao_credito">Cartão de Crédito</SelectItem>
+                            <SelectItem value="cartao_debito">Cartão de Débito</SelectItem>
+                            <SelectItem value="pix">PIX</SelectItem>
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  
+                  <div className="md:col-span-2">
+                    <FormField
+                      control={form.control}
+                      name="observacoes"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Observações</FormLabel>
+                          <FormControl>
+                            <Textarea 
+                              placeholder="Observações sobre o pedido" 
+                              className="resize-none" 
+                              {...field} 
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+                </div>
+                
+                <DialogFooter>
+                  <Button type="button" variant="outline" onClick={() => setIsOpen(false)}>
+                    Cancelar
+                  </Button>
+                  <Button 
+                    type="submit" 
+                    disabled={isSubmitting || itensSelecionados.length === 0}
+                    className="bg-primary hover:bg-primary-dark text-white"
+                  >
+                    {isSubmitting ? "Enviando..." : "Criar Pedido"}
+                  </Button>
+                </DialogFooter>
+              </form>
+            </Form>
+          </>
+        )}
       </DialogContent>
     </Dialog>
   );
