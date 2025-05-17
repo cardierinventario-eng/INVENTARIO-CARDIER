@@ -276,23 +276,29 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.patch("/api/estoque/:id/ajustar", async (req, res) => {
     try {
       const id = parseInt(req.params.id);
-      const schema = z.object({ quantidade: z.number() });
+      // Aceitar quantidade como string ou número
+      const schema = z.object({ 
+        quantidade: z.union([z.string(), z.number()]) 
+      });
       const { quantidade } = schema.parse(req.body);
       
-      const item = await storage.ajustarQuantidadeEstoque(id, quantidade);
+      // Convertemos para número ao processar
+      const qtdNumerica = typeof quantidade === 'string' ? parseInt(quantidade) : quantidade;
+      
+      const item = await storage.ajustarQuantidadeEstoque(id, qtdNumerica);
       
       if (!item) {
         return res.status(404).json({ message: "Item não encontrado" });
       }
       
       // Registrar movimentação
-      const tipo = quantidade > 0 ? "entrada" : "saida";
+      const tipo = qtdNumerica > 0 ? "entrada" : "saida";
       const itemNome = item.nome;
       
       await storage.createMovimentacaoEstoque({
         itemId: id,
         tipo,
-        quantidade: Math.abs(quantidade).toString(),
+        quantidade: Math.abs(qtdNumerica).toString(),
         usuarioId: 1, // Admin por padrão
         motivo: "Ajuste manual",
         produto: itemNome

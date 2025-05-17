@@ -52,7 +52,7 @@ export function LowStockItems() {
     
     try {
       await apiRequest(`/api/estoque/${itemId}/ajustar`, 'PATCH', { 
-        quantidade 
+        quantidade: quantidade.toString() 
       });
       
       // Atualizar os dados após o ajuste
@@ -62,11 +62,12 @@ export function LowStockItems() {
       
       // Registra a movimentação de estoque
       await apiRequest(`/api/estoque/movimentacoes`, 'POST', {
-        itemEstoqueId: itemId,
+        itemId: itemId,
         tipo: "entrada",
-        quantidade,
-        responsavel: "Usuário",
-        observacoes: "Ajuste rápido via dashboard"
+        quantidade: quantidade.toString(),
+        usuarioId: 1,
+        motivo: "Ajuste rápido via dashboard",
+        produto: getItemById(itemId)?.nome || "Item"
       });
       
       toast({
@@ -76,6 +77,7 @@ export function LowStockItems() {
       
       setOpenDialog(null);
     } catch (error) {
+      console.error("Erro ao ajustar estoque:", error);
       toast({
         title: "Erro ao ajustar estoque",
         description: "Não foi possível ajustar o estoque do item",

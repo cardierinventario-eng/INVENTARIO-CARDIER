@@ -74,7 +74,7 @@ export function AjustarEstoqueDialog({ item, children }: AjustarEstoqueDialogPro
       const ajuste = tipoMovimentacao === "entrada" ? quantidade : -quantidade;
       
       await apiRequest(`/api/estoque/${item.id}/ajustar`, "PATCH", { 
-        quantidade: ajuste 
+        quantidade: ajuste.toString() 
       });
       
       // 2. Registrar a movimentação no histórico
