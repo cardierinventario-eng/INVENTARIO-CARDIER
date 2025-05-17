@@ -11,9 +11,10 @@ import {
 import { Button } from "@/components/ui/button";
 import { StatusBadge } from "@/components/ui/status-badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Plus, ShoppingCart, Settings } from "lucide-react";
+import { Plus, ShoppingCart, Settings, Eye } from "lucide-react";
 import { NovaMesaDialog } from "@/components/mesas/nova-mesa-dialog";
 import { AdicionarProdutosDialog } from "@/components/mesas/adicionar-produtos-dialog";
+import { VisualizarPedidoDialog } from "@/components/pedidos/visualizar-pedido-dialog";
 import { 
   Dialog,
   DialogContent,
@@ -41,11 +42,39 @@ export default function Mesas() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [mesaSelecionadaProdutos, setMesaSelecionadaProdutos] = useState<Mesa | null>(null);
   const [produtosDialogAberto, setProdutosDialogAberto] = useState(false);
+  const [pedidoVisualizacaoId, setPedidoVisualizacaoId] = useState<number | null>(null);
+  const [visualizarPedidoAberto, setVisualizarPedidoAberto] = useState(false);
 
   const { data: mesas, isLoading } = useQuery<Mesa[]>({
     queryKey: ['/api/mesas'],
   });
 
+  // Buscar dados de pedidos para verificar pedidos de mesas
+  const { data: pedidos = [] } = useQuery({
+    queryKey: ['/api/pedidos'],
+  });
+  
+  // Função para buscar o pedido ativo (não finalizado e não cancelado) de uma mesa
+  const buscarPedidoAtivoDaMesa = (mesaId: number) => {
+    const pedidosDaMesa = (pedidos as any[]).filter(
+      p => p.mesaId === mesaId && 
+      p.tipo === "mesa" && 
+      p.status !== "finalizado" && 
+      p.status !== "cancelado"
+    );
+    
+    return pedidosDaMesa.length > 0 ? pedidosDaMesa[0] : null;
+  };
+  
+  // Função para visualizar pedido da mesa
+  const visualizarPedidoMesa = (mesaId: number) => {
+    const pedido = buscarPedidoAtivoDaMesa(mesaId);
+    if (pedido) {
+      setPedidoVisualizacaoId(pedido.id);
+      setVisualizarPedidoAberto(true);
+    }
+  };
+  
   const mesasFiltradas = mesas?.filter(mesa => {
     if (selectedStatus === "todos") return true;
     return mesa.status.toLowerCase() === selectedStatus.toLowerCase();
@@ -209,12 +238,9 @@ export default function Mesas() {
                     <Button 
                       variant="outline"
                       className="w-full mt-2 border-primary text-primary hover:bg-primary/10"
-                      onClick={() => {
-                        // Navegar para os pedidos da mesa
-                        window.location.href = `/pedidos?mesa=${mesa.id}`;
-                      }}
+                      onClick={() => visualizarPedidoMesa(mesa.id)}
                     >
-                      Ver Pedido
+                      <Eye className="mr-2 h-4 w-4" /> Ver Pedido
                     </Button>
                   )}
                 </CardFooter>
@@ -299,6 +325,18 @@ export default function Mesas() {
           aoFechar={() => {
             setProdutosDialogAberto(false);
             setMesaSelecionadaProdutos(null);
+          }}
+        />
+      )}
+      
+      {/* Diálogo para visualizar o pedido da mesa */}
+      {pedidoVisualizacaoId !== null && (
+        <VisualizarPedidoDialog
+          pedidoId={pedidoVisualizacaoId}
+          aberto={visualizarPedidoAberto}
+          aoFechar={() => {
+            setVisualizarPedidoAberto(false);
+            setPedidoVisualizacaoId(null);
           }}
         />
       )}
