@@ -332,7 +332,15 @@ export function ComprovanteImpressao({
           
           ${incluirTotais ? `
           <div class="total-row">
-            TOTAL: R$ ${parseFloat(pedido.valorTotal).toFixed(2)}
+            TOTAL: R$ ${
+              // Calcular o valor total a partir dos itens para garantir que seja um número válido
+              Array.isArray(itensPedido) ? 
+                itensPedido.reduce((total, item) => {
+                  const preco = typeof item.preco === 'string' ? parseFloat(item.preco) : item.preco;
+                  return total + (preco * item.quantidade);
+                }, 0).toFixed(2) : 
+                "0.00"
+            }
           </div>
           ` : ''}
           
