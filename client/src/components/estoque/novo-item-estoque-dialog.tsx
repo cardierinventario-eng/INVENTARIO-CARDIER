@@ -77,9 +77,14 @@ export function NovoItemEstoqueDialog() {
     setIsSubmitting(true);
     try {
       const novoItem = {
-        ...data,
-        // Garantir que o preço é uma string no formato correto para decimal
-        precoUnitario: data.precoUnitario.replace(",", "."),
+        nome: data.nome,
+        categoria: data.categoria,
+        descricao: data.descricao || "",
+        quantidade: data.quantidade,
+        unidade: data.unidade,
+        valorUnitario: data.precoUnitario.replace(",", "."),
+        estoqueMinimo: data.estoqueMinimo,
+        estoqueIdeal: data.estoqueIdeal
       };
       
       await apiRequest("/api/estoque", "POST", novoItem);
