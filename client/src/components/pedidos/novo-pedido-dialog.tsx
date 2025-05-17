@@ -246,18 +246,18 @@ export function NovoPedidoDialog({ open = false, onOpenChange }: NovoPedidoDialo
           padding-bottom: 5px; 
         }
         .titulo { 
-          font-size: 14px; 
+          font-size: 18px; 
           font-weight: bold; 
           margin-bottom: 3px; 
         }
         .subtitulo { 
-          font-size: 12px; 
+          font-size: 16px; 
           margin-bottom: 3px; 
         }
         .info-row { 
           display: flex; 
-          margin-bottom: 3px;
-          font-size: 10px;
+          margin-bottom: 5px;
+          font-size: 14px;
         }
         .info-label { 
           font-weight: bold; 
@@ -270,7 +270,7 @@ export function NovoPedidoDialog({ open = false, onOpenChange }: NovoPedidoDialo
           width: 100%; 
           border-collapse: collapse; 
           margin: 8px 0;
-          font-size: 9px;
+          font-size: 13px;
         }
         .tabela th, .tabela td { 
           border-bottom: 1px solid #eee; 
@@ -286,11 +286,11 @@ export function NovoPedidoDialog({ open = false, onOpenChange }: NovoPedidoDialo
           margin-top: 8px;
           margin-bottom: 8px;
           text-align: right;
-          font-size: 12px;
+          font-size: 16px;
         }
         .observacoes { 
           margin-top: 8px;
-          font-size: 9px;
+          font-size: 13px;
         }
         .observacoes-titulo { 
           font-weight: bold; 
@@ -299,7 +299,7 @@ export function NovoPedidoDialog({ open = false, onOpenChange }: NovoPedidoDialo
         .footer { 
           margin-top: 10px; 
           text-align: center; 
-          font-size: 9px; 
+          font-size: 13px; 
           border-top: 1px solid #ccc; 
           padding-top: 5px; 
         }
