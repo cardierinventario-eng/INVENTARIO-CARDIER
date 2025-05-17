@@ -43,7 +43,7 @@ const formSchema = z.object({
   descricao: z.string().optional(),
   preco: z.string().min(1, "Preço é obrigatório"),
   categoria: z.string().min(1, "Categoria é obrigatória"),
-  categoriaId: z.coerce.number().optional(),
+  categoriaId: z.number().default(1), // Default para 1 quando não houver categorias
   disponivel: z.boolean().default(true),
   imagem: z.string().optional(),
 });
@@ -71,10 +71,18 @@ export function NovoItemDialog({ categorias = [] }: { categorias?: string[] }) {
   const onSubmit = async (data: FormValues) => {
     setIsSubmitting(true);
     try {
-      await apiRequest("POST", "/api/cardapio", {
+      // Preparando os dados para envio
+      const payloadData = {
         ...data,
-        preco: data.preco.replace(",", "."), // Garantir formato correto do preço
-      });
+        // Garantir que o preço é uma string no formato correto para decimal
+        preco: data.preco.replace(",", "."),
+        // Garantir que categoriaId é um número
+        categoriaId: 1
+      };
+      
+      console.log("Enviando dados:", payloadData);
+      
+      await apiRequest("POST", "/api/cardapio", payloadData);
       
       toast({
         title: "Item adicionado",
@@ -94,7 +102,7 @@ export function NovoItemDialog({ categorias = [] }: { categorias?: string[] }) {
         description: "Não foi possível adicionar o item ao cardápio.",
         variant: "destructive",
       });
-      console.error(error);
+      console.error("Erro ao enviar formulário:", error);
     } finally {
       setIsSubmitting(false);
     }

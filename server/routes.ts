@@ -94,13 +94,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post("/api/cardapio", async (req, res) => {
     try {
-      // Converter preço para número se vier como string
-      if (typeof req.body.preco === 'string') {
-        req.body.preco = parseFloat(req.body.preco.replace(',', '.'));
-      }
+      console.log("Dados recebidos:", req.body);
       
-      const data = insertItemCardapioSchema.parse(req.body);
-      const item = await storage.createItemCardapio(data);
+      // Criar schema personalizado para validação
+      const customSchema = z.object({
+        nome: z.string(),
+        descricao: z.string().optional(),
+        preco: z.string(), // Aceita string que será convertida para decimal
+        categoria: z.string(),
+        categoriaId: z.number().default(1),
+        disponivel: z.boolean().default(true),
+        imagem: z.string().optional(),
+      });
+      
+      // Validar com o schema personalizado
+      const validatedData = customSchema.parse(req.body);
+      
+      // Criar item no cardápio
+      const item = await storage.createItemCardapio(validatedData);
       res.status(201).json(item);
     } catch (error) {
       console.error("Erro ao criar item do cardápio:", error);
