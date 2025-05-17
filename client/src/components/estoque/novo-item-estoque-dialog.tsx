@@ -80,11 +80,11 @@ export function NovoItemEstoqueDialog() {
         nome: data.nome,
         categoria: data.categoria,
         descricao: data.descricao || "",
-        quantidade: data.quantidade,
+        quantidade: data.quantidade.toString(),
         unidade: data.unidade,
         valorUnitario: data.precoUnitario.replace(",", "."),
-        estoqueMinimo: data.estoqueMinimo,
-        estoqueIdeal: data.estoqueIdeal
+        estoqueMinimo: data.estoqueMinimo.toString(),
+        estoqueIdeal: data.estoqueIdeal.toString()
       };
       
       await apiRequest("/api/estoque", "POST", novoItem);
