@@ -13,7 +13,7 @@ import { StatusBadge } from "@/components/ui/status-badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Plus, ShoppingCart, Settings } from "lucide-react";
 import { NovaMesaDialog } from "@/components/mesas/nova-mesa-dialog";
-import { ProdutosMesaDialog } from "@/components/mesas/produtos-mesa-dialog";
+import { AdicionarProdutosDialog } from "@/components/mesas/adicionar-produtos-dialog";
 import { 
   Dialog,
   DialogContent,
@@ -39,6 +39,8 @@ export default function Mesas() {
   const [selectedStatus, setSelectedStatus] = useState("todos");
   const [selectedMesa, setSelectedMesa] = useState<Mesa | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [mesaSelecionadaProdutos, setMesaSelecionadaProdutos] = useState<Mesa | null>(null);
+  const [produtosDialogAberto, setProdutosDialogAberto] = useState(false);
 
   const { data: mesas, isLoading } = useQuery<Mesa[]>({
     queryKey: ['/api/mesas'],
@@ -190,18 +192,17 @@ export default function Mesas() {
                   </Button>
                   
                   {/* Botão para adicionar produtos à mesa */}
-                  <ProdutosMesaDialog 
-                    mesa={mesa}
-                    trigger={
-                      <Button 
-                        variant="default"
-                        className="gap-1 flex-1"
-                      >
-                        <ShoppingCart className="h-4 w-4" />
-                        Produtos
-                      </Button>
-                    }
-                  />
+                  <Button 
+                    variant="default"
+                    className="gap-1 flex-1"
+                    onClick={() => {
+                      setMesaSelecionadaProdutos(mesa);
+                      setProdutosDialogAberto(true);
+                    }}
+                  >
+                    <ShoppingCart className="h-4 w-4" />
+                    Produtos
+                  </Button>
                   
                   {/* Botão para visualizar pedido da mesa, se estiver ocupada */}
                   {mesa.status.toLowerCase() === 'ocupada' && (

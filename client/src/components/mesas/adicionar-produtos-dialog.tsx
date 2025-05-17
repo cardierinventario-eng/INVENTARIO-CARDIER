@@ -9,7 +9,6 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -28,7 +27,7 @@ import {
   CardContent,
 } from "@/components/ui/card";
 import { formatCurrency } from "@/lib/utils";
-import { ShoppingCart, Plus, Trash2 } from "lucide-react";
+import { Plus, Trash2 } from "lucide-react";
 import { type Mesa } from "@shared/schema";
 
 interface ItemProduto {
@@ -39,21 +38,18 @@ interface ItemProduto {
   observacoes?: string;
 }
 
-interface ProdutosMesaDialogProps {
+interface AdicionarProdutosDialogProps {
   mesa: Mesa;
-  trigger?: React.ReactNode;
+  aberto: boolean;
+  aoFechar: () => void;
 }
 
-export function ProdutosMesaDialog({ mesa, trigger }: ProdutosMesaDialogProps) {
-  const [open, setOpen] = useState(false);
+export function AdicionarProdutosDialog({ mesa, aberto, aoFechar }: AdicionarProdutosDialogProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [itemSelecionadoId, setItemSelecionadoId] = useState<number | undefined>(undefined);
   const [quantidade, setQuantidade] = useState(1);
   const [observacoes, setObservacoes] = useState("");
   const [itensSelecionados, setItensSelecionados] = useState<ItemProduto[]>([]);
-  
-  // Use uma ref para o botão trigger personalizado
-  const triggerRef = React.useRef<HTMLButtonElement>(null);
   
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -65,9 +61,6 @@ export function ProdutosMesaDialog({ mesa, trigger }: ProdutosMesaDialogProps) {
   
   // Filtrar apenas itens disponíveis
   const itensDisponiveis = (itensCardapio as any[]).filter(item => item.disponivel);
-  
-  // Item selecionado atual
-  const itemAtual = itensDisponiveis.find(item => item.id === itemSelecionadoId);
   
   // Valor total
   const valorTotal = itensSelecionados.reduce(
@@ -186,12 +179,9 @@ export function ProdutosMesaDialog({ mesa, trigger }: ProdutosMesaDialogProps) {
         description: `Os itens foram adicionados à Mesa ${mesa.numero}.`,
       });
       
-      // Fechar o diálogo e resetar formulário
-      setOpen(false);
-      setItensSelecionados([]);
-      setItemSelecionadoId(undefined);
-      setQuantidade(1);
-      setObservacoes("");
+      // Limpar e fechar
+      limparCampos();
+      aoFechar();
       
     } catch (error) {
       console.error("Erro ao criar pedido:", error);
@@ -205,28 +195,22 @@ export function ProdutosMesaDialog({ mesa, trigger }: ProdutosMesaDialogProps) {
     }
   };
   
-  // Função para fechar o diálogo
-  const fecharDialog = () => {
-    setOpen(false);
+  // Limpar campos
+  const limparCampos = () => {
     setItensSelecionados([]);
     setItemSelecionadoId(undefined);
     setQuantidade(1);
     setObservacoes("");
   };
   
+  // Quando o diálogo é fechado
+  const handleOnClose = () => {
+    limparCampos();
+    aoFechar();
+  };
+  
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        {trigger || (
-          <Button 
-            variant="default"
-            onClick={() => setOpen(true)}
-          >
-            <ShoppingCart className="mr-2 h-4 w-4" /> Produtos
-          </Button>
-        )}
-      </DialogTrigger>
-      
+    <Dialog open={aberto} onOpenChange={(open) => !open && handleOnClose()}>
       <DialogContent className="sm:max-w-[600px]">
         <DialogHeader>
           <DialogTitle>Adicionar Produtos à Mesa {mesa.numero}</DialogTitle>
@@ -272,6 +256,7 @@ export function ProdutosMesaDialog({ mesa, trigger }: ProdutosMesaDialogProps) {
                 onClick={adicionarItem}
                 disabled={!itemSelecionadoId}
                 className="w-full"
+                type="button"
               >
                 <Plus className="mr-2 h-4 w-4" /> Adicionar
               </Button>
@@ -323,6 +308,7 @@ export function ProdutosMesaDialog({ mesa, trigger }: ProdutosMesaDialogProps) {
                             size="sm"
                             className="h-8 w-8 p-0"
                             onClick={() => removerItem(index)}
+                            type="button"
                           >
                             <Trash2 className="h-4 w-4" />
                             <span className="sr-only">Remover</span>
@@ -346,7 +332,7 @@ export function ProdutosMesaDialog({ mesa, trigger }: ProdutosMesaDialogProps) {
         <DialogFooter>
           <Button 
             variant="outline" 
-            onClick={fecharDialog}
+            onClick={handleOnClose}
             type="button"
           >
             Cancelar
@@ -356,11 +342,7 @@ export function ProdutosMesaDialog({ mesa, trigger }: ProdutosMesaDialogProps) {
             disabled={isSubmitting || itensSelecionados.length === 0}
             type="button"
           >
-            {isSubmitting ? (
-              "Criando pedido..."
-            ) : (
-              "Criar Pedido"
-            )}
+            {isSubmitting ? "Criando pedido..." : "Criar Pedido"}
           </Button>
         </DialogFooter>
       </DialogContent>
