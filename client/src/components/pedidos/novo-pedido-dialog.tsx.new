@@ -486,8 +486,8 @@ export function NovoPedidoDialog({ open = false, onOpenChange }: NovoPedidoDialo
                       </FormControl>
                       <SelectContent>
                         <SelectItem value="dinheiro">Dinheiro</SelectItem>
-                        <SelectItem value="credito">Cartão de Crédito</SelectItem>
-                        <SelectItem value="debito">Cartão de Débito</SelectItem>
+                        <SelectItem value="cartao_credito">Cartão de Crédito</SelectItem>
+                        <SelectItem value="cartao_debito">Cartão de Débito</SelectItem>
                         <SelectItem value="pix">PIX</SelectItem>
                       </SelectContent>
                     </Select>
@@ -495,46 +495,38 @@ export function NovoPedidoDialog({ open = false, onOpenChange }: NovoPedidoDialo
                   </FormItem>
                 )}
               />
+              
+              <div className="md:col-span-2">
+                <FormField
+                  control={form.control}
+                  name="observacoes"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Observações</FormLabel>
+                      <FormControl>
+                        <Textarea 
+                          placeholder="Observações sobre o pedido" 
+                          className="resize-none" 
+                          {...field} 
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
             </div>
             
-            <FormField
-              control={form.control}
-              name="observacoes"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Observações</FormLabel>
-                  <FormControl>
-                    <Textarea 
-                      placeholder="Alguma observação sobre o pedido..." 
-                      className="resize-none" 
-                      {...field} 
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            
             <DialogFooter>
-              <Button 
-                type="button" 
-                variant="outline" 
-                onClick={() => setIsOpen(false)}
-                disabled={isSubmitting}
-              >
+              <Button type="button" variant="outline" onClick={() => setIsOpen(false)}>
                 Cancelar
               </Button>
               <Button 
-                type="submit"
+                type="submit" 
                 disabled={isSubmitting || itensSelecionados.length === 0}
-                className="bg-primary"
+                className="bg-primary hover:bg-primary-dark text-white"
               >
-                {isSubmitting ? "Finalizando..." : (
-                  <>
-                    <CreditCard className="h-4 w-4 mr-2" />
-                    Finalizar Pedido
-                  </>
-                )}
+                {isSubmitting ? "Enviando..." : "Criar Pedido"}
               </Button>
             </DialogFooter>
           </form>
