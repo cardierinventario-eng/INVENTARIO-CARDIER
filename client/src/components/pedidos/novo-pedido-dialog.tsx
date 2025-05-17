@@ -705,32 +705,29 @@ export function NovoPedidoDialog({ open = false, onOpenChange }: NovoPedidoDialo
                       render={({ field }) => (
                         <FormItem>
                           <FormLabel>Mesa*</FormLabel>
-                          <Select 
-                            onValueChange={(value) => {
-                              // Verificar se é um valor válido antes de converter
-                              if (value) {
-                                field.onChange(parseInt(value));
-                              }
-                            }} 
-                            value={field.value?.toString() || undefined}
-                          >
-                            <FormControl>
-                              <SelectTrigger>
-                                <SelectValue placeholder="Selecione a mesa" />
-                              </SelectTrigger>
-                            </FormControl>
-                            <SelectContent>
-                              {Array.isArray(mesasDisponiveis) && mesasDisponiveis.length > 0 ? (
-                                mesasDisponiveis.map((mesa: any) => (
-                                  <SelectItem key={mesa.id} value={mesa.id.toString()}>
-                                    Mesa {mesa.numero} - {mesa.capacidade} lugares
-                                  </SelectItem>
-                                ))
-                              ) : (
-                                <SelectItem value="sem-mesas">Não há mesas disponíveis</SelectItem>
-                              )}
-                            </SelectContent>
-                          </Select>
+                          <div className="flex flex-col space-y-2">
+                            {Array.isArray(mesasDisponiveis) && mesasDisponiveis.length > 0 ? (
+                              mesasDisponiveis.map((mesa: any) => (
+                                <div 
+                                  key={mesa.id} 
+                                  className={`border rounded-md p-2 cursor-pointer flex justify-between items-center ${field.value === mesa.id ? 'bg-primary/10 border-primary' : 'hover:bg-muted'}`}
+                                  onClick={() => field.onChange(mesa.id)}
+                                >
+                                  <div>
+                                    <span className="font-medium">Mesa {mesa.numero}</span>
+                                    <span className="ml-2 text-sm text-muted-foreground">({mesa.capacidade} lugares)</span>
+                                  </div>
+                                  {field.value === mesa.id && (
+                                    <div className="h-4 w-4 rounded-full bg-primary"></div>
+                                  )}
+                                </div>
+                              ))
+                            ) : (
+                              <div className="text-muted-foreground text-center py-2">
+                                Não há mesas disponíveis
+                              </div>
+                            )}
+                          </div>
                           <FormMessage />
                         </FormItem>
                       )}
