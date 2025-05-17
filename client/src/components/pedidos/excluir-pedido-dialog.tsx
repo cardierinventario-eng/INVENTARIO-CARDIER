@@ -20,9 +20,14 @@ import { Trash2 } from "lucide-react";
 interface ExcluirPedidoDialogProps {
   pedido: any;
   trigger?: React.ReactNode;
+  onDelete?: () => void;
 }
 
-export function ExcluirPedidoDialog({ pedido, trigger }: ExcluirPedidoDialogProps) {
+export function ExcluirPedidoDialog({ pedido, trigger, onDelete }: ExcluirPedidoDialogProps) {
+  // Verificação de segurança para props
+  if (!pedido) {
+    return null;
+  }
   const [isOpen, setIsOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const queryClient = useQueryClient();
@@ -43,6 +48,12 @@ export function ExcluirPedidoDialog({ pedido, trigger }: ExcluirPedidoDialogProp
       // Invalidar cache para atualizar listagens
       queryClient.invalidateQueries({ queryKey: ['/api/pedidos'] });
       queryClient.invalidateQueries({ queryKey: ['/api/pedidos/recentes'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/dashboard/stats'] });
+      
+      // Chamar o callback de exclusão, se fornecido
+      if (onDelete) {
+        onDelete();
+      }
       
     } catch (error) {
       console.error("Erro ao excluir pedido:", error);

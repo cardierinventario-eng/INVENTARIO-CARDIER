@@ -48,6 +48,10 @@ interface EditarPedidoDialogProps {
 }
 
 export function EditarPedidoDialog({ pedido, isOpen, onOpenChange }: EditarPedidoDialogProps) {
+  // Prevenção contra props undefined
+  if (!pedido || !onOpenChange) {
+    return null;
+  }
   const [isSubmitting, setIsSubmitting] = useState(false);
   const queryClient = useQueryClient();
   const { toast } = useToast();
