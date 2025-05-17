@@ -45,11 +45,11 @@ export default function Pedidos() {
   const mesaIdParam = urlParams.get('mesa');
   const acaoParam = urlParams.get('acao');
   
-  // Se tiver o parâmetro de mesa e a ação for "adicionar", abrir o diálogo de novo pedido
-  const mostrarNovoPedido = mesaIdParam !== null && acaoParam === 'adicionar';
+  // Se a ação for "adicionar", abrir o diálogo de novo pedido, independente de ter mesa ou não
+  const mostrarNovoPedido = acaoParam === 'adicionar';
   
-  // Converter mesaId para número se existir
-  const mesaId = mesaIdParam ? parseInt(mesaIdParam) : undefined;
+  // Converter mesaId para número se existir, senão deixar undefined
+  const mesaId = mesaIdParam && mesaIdParam !== "null" ? parseInt(mesaIdParam) : undefined;
   
   // Função para abrir o diálogo de visualização de pedido
   const handleVisualizarPedido = (pedido: any) => {

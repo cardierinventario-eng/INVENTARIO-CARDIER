@@ -30,8 +30,10 @@ export function QuickActions() {
       const novoPedido = {
         tipo: "balcao",
         nomeCliente: "Cliente Balcão",
-        observacoes: "",
-        status: "pendente"
+        numero: Math.floor(1000 + Math.random() * 9000), // Número aleatório de 4 dígitos
+        valorTotal: 0, // Será atualizado quando itens forem adicionados
+        status: "pendente",
+        observacoes: ""
       };
       
       const response = await apiRequest('/api/pedidos', 'POST', novoPedido);
@@ -123,13 +125,13 @@ export function QuickActions() {
           <h2 className="font-heading font-bold text-lg">Ações Rápidas</h2>
         </div>
         <div className="p-5 grid grid-cols-2 gap-4">
-          <Link 
-            href="/pedidos/novo" 
-            className="bg-primary text-white p-4 rounded-lg text-center hover:bg-primary-dark transition flex flex-col items-center justify-center"
+          <Button
+            onClick={() => setLocation(`/pedidos?mesa=${null}&acao=adicionar`)}
+            className="bg-primary text-white p-4 h-auto rounded-lg text-center hover:bg-primary-dark transition flex flex-col items-center justify-center"
           >
             <i className="fas fa-plus-circle text-2xl mb-2"></i>
             <p className="text-sm font-medium">Novo Pedido</p>
-          </Link>
+          </Button>
           
           <Button
             onClick={() => criarPedidoBalcao()}
