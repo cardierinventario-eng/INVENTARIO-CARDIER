@@ -79,13 +79,20 @@ export function AdicionarProdutosMesaDialog({
     0
   );
 
-  // Limpar os campos ao fechar o diálogo
+  // Limpar os campos ao abrir/fechar o diálogo
   useEffect(() => {
-    if (!isOpen) {
-      setItensSelecionados([]);
-      setItemSelecionadoId(0);
-      setQuantidade(1);
-      setObservacoes("");
+    // Reset apenas quando o diálogo é fechado, não quando é aberto
+    if (isOpen === false) {
+      // Pequeno timeout para garantir que o componente não está mais renderizando
+      // quando limparmos os valores, evitando erros de removeChild
+      const timer = setTimeout(() => {
+        setItensSelecionados([]);
+        setItemSelecionadoId(0);
+        setQuantidade(1);
+        setObservacoes("");
+      }, 100);
+      
+      return () => clearTimeout(timer);
     }
   }, [isOpen]);
 
@@ -140,19 +147,39 @@ export function AdicionarProdutosMesaDialog({
     setIsLoading(true);
 
     try {
-      // 1. Criar o pedido
-      const pedidoResponse = await apiRequest("POST", "/api/pedidos", {
-        tipo: "mesa",
-        mesaId: mesa.id,
-        nomeCliente: "",
-        observacoes: "",
-        status: "em preparo"
-      });
+      // Verificar se a mesa já tem um pedido em aberto
+      const pedidosResponse = await apiRequest("GET", "/api/pedidos");
+      const pedidosExistentes = Array.isArray(pedidosResponse) ? pedidosResponse : [];
+      
+      // Buscar pedido da mesa que não esteja finalizado
+      const pedidoExistente = pedidosExistentes.find(p => 
+        p.mesaId === mesa.id && 
+        p.status !== 'finalizado' && 
+        p.status !== 'cancelado'
+      );
+      
+      let pedidoId;
+      
+      if (pedidoExistente) {
+        // Se já existe um pedido, usar ele
+        pedidoId = pedidoExistente.id;
+      } else {
+        // Se não existe, criar um novo pedido
+        const pedidoResponse = await apiRequest("POST", "/api/pedidos", {
+          tipo: "mesa",
+          mesaId: mesa.id,
+          nomeCliente: "",
+          observacoes: "",
+          status: "em preparo"
+        });
+        
+        pedidoId = pedidoResponse.id;
+      }
 
       // 2. Adicionar itens ao pedido
       for (const item of itensSelecionados) {
         await apiRequest("POST", "/api/pedidos/itens", {
-          pedidoId: pedidoResponse.id,
+          pedidoId: pedidoId,
           itemCardapioId: item.itemCardapioId,
           nome: item.nome,
           preco: item.preco,
@@ -194,7 +221,14 @@ export function AdicionarProdutosMesaDialog({
   };
 
   return (
-    <Dialog open={isOpen} onOpenChange={setIsOpen}>
+    <Dialog open={isOpen} onOpenChange={(open) => {
+      // Controle de abertura/fechamento mais seguro
+      if (!open && isLoading) {
+        // Impedir fechamento durante operações em andamento
+        return;
+      }
+      setIsOpen(open);
+    }}>
       {trigger ? (
         <DialogTrigger asChild>
           {trigger}
