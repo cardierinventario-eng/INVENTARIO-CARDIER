@@ -36,9 +36,7 @@ export function QuickActions() {
         observacoes: ""
       };
       
-      const response = await apiRequest('/api/pedidos', 'POST', novoPedido);
-      
-      const pedidoCriado = await response.json();
+      const pedidoCriado = await apiRequest('/api/pedidos', 'POST', novoPedido);
       
       toast({
         title: "Pedido de balcão criado",
