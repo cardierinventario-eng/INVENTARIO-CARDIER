@@ -344,7 +344,13 @@ export function ProdutosMesaDialog({ mesa, trigger }: ProdutosMesaDialogProps) {
         </div>
         
         <DialogFooter>
-          <Button variant="outline" onClick={() => setIsOpen(false)}>
+          <Button 
+            variant="outline" 
+            onClick={() => {
+              setIsOpen(false);
+              handleOpenChange(false);
+            }}
+          >
             Cancelar
           </Button>
           <Button 
