@@ -34,6 +34,8 @@ export function VisualizarPedidoDialog({
   aberto, 
   aoFechar 
 }: VisualizarPedidoDialogProps) {
+  // Renderizar somente quando estiver realmente aberto
+  if (!aberto) return null;
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -124,7 +126,7 @@ export function VisualizarPedidoDialog({
   );
 
   return (
-    <Dialog open={aberto} onOpenChange={(open) => !open && aoFechar()}>
+    <Dialog open={true} onOpenChange={(open) => !open && aoFechar()}>
       <DialogContent className="sm:max-w-[700px] max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Detalhes do Pedido</DialogTitle>
