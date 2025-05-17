@@ -159,6 +159,16 @@ export default function Pedidos() {
                               </Link>
                             </Button>
                             
+                            <ComprovanteImpressao 
+                              pedidoId={pedido.id}
+                              mesaId={pedido.mesaId}
+                              trigger={
+                                <Button variant="ghost" size="icon" className="h-8 w-8">
+                                  <Printer className="h-4 w-4" />
+                                </Button>
+                              }
+                            />
+                            
                             <Button 
                               variant="ghost" 
                               size="icon" 

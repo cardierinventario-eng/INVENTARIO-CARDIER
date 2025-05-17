@@ -494,10 +494,15 @@ export function NovoPedidoDialog({ open = false, onOpenChange }: NovoPedidoDialo
       });
       
       // Atualizar status da mesa se necessário
-      if (data.tipo === "mesa" && data.mesaId) {
-        await apiRequest("PATCH", `/api/mesas/${data.mesaId}/status`, {
-          status: "ocupada"
-        });
+      try {
+        if (data.tipo === "mesa" && data.mesaId) {
+          await apiRequest("PATCH", `/api/mesas/${data.mesaId}/status`, {
+            status: "ocupada"
+          });
+        }
+      } catch (mesaError) {
+        console.error("Erro ao atualizar status da mesa:", mesaError);
+        // Continuar mesmo com erro na atualização da mesa
       }
       
       // Invalidar cache para atualizar listagens
