@@ -629,15 +629,19 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getRelatorioVendas(): Promise<RelatorioVendas> {
-    // Verificar se o relatório foi zerado
-    if (this.relatorioVendasZerado) {
+    // Buscar configuração para verificar se o relatório foi zerado
+    const config = await this.getConfiguracao();
+    
+    if (config?.dataZeramentoVendas && config?.relatorioVendasZerado) {
       console.log("Relatório foi zerado anteriormente, verificando tempo decorrido");
       
-      // Se o relatório foi zerado, retornar os dados zerados
+      // Se o relatório foi zerado, retornar os dados zerados armazenados no banco
+      const relatorioZerado = config.relatorioVendasZerado as any;
+      
       return {
-        vendasPorDia: this.relatorioVendasZerado.vendasPorDia,
-        vendasPorCategoria: this.relatorioVendasZerado.vendasPorCategoria,
-        produtosMaisVendidos: this.relatorioVendasZerado.produtosMaisVendidos
+        vendasPorDia: relatorioZerado.vendasPorDia || [],
+        vendasPorCategoria: relatorioZerado.vendasPorCategoria || [],
+        produtosMaisVendidos: relatorioZerado.produtosMaisVendidos || []
       };
     }
     
@@ -854,9 +858,7 @@ export class DatabaseStorage implements IStorage {
 
   async zerarRelatorioVendas(): Promise<boolean> {
     try {
-      // Em um sistema com banco de dados, idealmente criaríamos uma tabela para
-      // armazenar as configurações de zeramento. Por simplicidade, vamos manter
-      // o comportamento atual usando as propriedades da classe.
+      // Criar objetos para armazenar no banco de dados
       
       // Gerar dados de vendas por dia zerados (últimos 7 dias)
       const vendasPorDia = [];
@@ -874,8 +876,8 @@ export class DatabaseStorage implements IStorage {
         });
       }
       
-      // Definir um "marco zero" para o relatório de vendas
-      this.relatorioVendasZerado = {
+      // Dados do relatório de vendas zerado
+      const relatorioVendasZerado = {
         data: new Date(), // Marca quando o relatório foi zerado
         vendasPorDia: vendasPorDia,
         vendasPorCategoria: [
@@ -903,8 +905,8 @@ export class DatabaseStorage implements IStorage {
         });
       }
       
-      // Definir um "marco zero" para o relatório financeiro
-      this.relatorioFinanceiroZerado = {
+      // Dados do relatório financeiro zerado
+      const relatorioFinanceiroZerado = {
         data: new Date(),
         receitasPorDia: receitasPorDia,
         despesasPorCategoria: [
@@ -923,7 +925,36 @@ export class DatabaseStorage implements IStorage {
         }
       };
       
-      console.log("Relatórios de vendas e financeiro zerados com sucesso");
+      // Buscar a configuração atual ou criar uma nova
+      const configExistente = await this.getConfiguracao();
+      
+      if (configExistente) {
+        // Atualizar configuração existente com os novos dados de zeramento
+        await db
+          .update(configuracoes)
+          .set({
+            dataZeramentoVendas: new Date(),
+            dataZeramentoFinanceiro: new Date(),
+            relatorioVendasZerado,
+            relatorioFinanceiroZerado
+          })
+          .where(eq(configuracoes.id, configExistente.id));
+      } else {
+        // Criar nova configuração com os dados de zeramento
+        await db
+          .insert(configuracoes)
+          .values({
+            nomeEmpresa: "Lanche Fácil",
+            tema: "claro",
+            moeda: "R$",
+            dataZeramentoVendas: new Date(),
+            dataZeramentoFinanceiro: new Date(),
+            relatorioVendasZerado,
+            relatorioFinanceiroZerado
+          });
+      }
+      
+      console.log("Relatórios de vendas e financeiro zerados com sucesso no banco de dados");
       return true;
     } catch (error) {
       console.error("Erro ao zerar relatórios:", error);
