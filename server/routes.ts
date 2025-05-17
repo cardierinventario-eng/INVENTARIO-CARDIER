@@ -409,14 +409,40 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   app.delete("/api/pedidos/:id", async (req, res) => {
-    const id = parseInt(req.params.id);
-    const success = await storage.deletePedido(id);
-    
-    if (!success) {
-      return res.status(404).json({ message: "Pedido não encontrado" });
+    try {
+      const id = parseInt(req.params.id);
+      console.log(`Recebida solicitação para excluir pedido ${id}`);
+      
+      // Verificar se o pedido existe
+      const pedido = await storage.getPedido(id);
+      if (!pedido) {
+        console.log(`Pedido ${id} não encontrado`);
+        return res.status(404).json({ message: "Pedido não encontrado" });
+      }
+      
+      console.log(`Pedido ${id} encontrado, tipo: ${pedido.tipo}, mesa: ${pedido.mesaId || 'N/A'}`);
+      
+      // Obter itens do pedido para log
+      const itens = await storage.getItensPedido(id);
+      console.log(`Pedido ${id} possui ${itens.length} itens para excluir`);
+      
+      // Excluir pedido e seus itens
+      const success = await storage.deletePedido(id);
+      
+      if (!success) {
+        console.log(`Falha ao excluir pedido ${id}`);
+        return res.status(500).json({ message: "Erro ao excluir pedido" });
+      }
+      
+      console.log(`Pedido ${id} excluído com sucesso via API`);
+      res.status(204).end();
+    } catch (error) {
+      console.error("Erro na rota de exclusão de pedido:", error);
+      res.status(500).json({ 
+        message: "Erro interno ao processar a exclusão do pedido",
+        error: error instanceof Error ? error.message : String(error)
+      });
     }
-    
-    res.status(204).end();
   });
 
   app.post("/api/pedidos/:id/itens", async (req, res) => {
