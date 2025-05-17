@@ -31,7 +31,7 @@ export function ExcluirItemDialog({ item, trigger }: ExcluirItemDialogProps) {
   const handleExcluir = async () => {
     setIsSubmitting(true);
     try {
-      await apiRequest("DELETE", `/api/cardapio/${item.id}`);
+      await apiRequest(`/api/cardapio/${item.id}`, "DELETE");
       
       toast({
         title: "Item excluído",

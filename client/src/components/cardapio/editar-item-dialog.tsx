@@ -105,7 +105,7 @@ export function EditarItemDialog({ item, categorias = [], trigger }: EditarItemD
       
       console.log("Enviando dados para atualização:", payloadData);
       
-      await apiRequest("PATCH", `/api/cardapio/${item.id}`, payloadData);
+      await apiRequest(`/api/cardapio/${item.id}`, "PATCH", payloadData);
       
       toast({
         title: "Item atualizado",

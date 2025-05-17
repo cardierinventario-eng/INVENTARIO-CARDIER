@@ -82,7 +82,7 @@ export function NovoItemDialog({ categorias = [] }: { categorias?: string[] }) {
       
       console.log("Enviando dados:", payloadData);
       
-      await apiRequest("POST", "/api/cardapio", payloadData);
+      await apiRequest("/api/cardapio", "POST", payloadData);
       
       toast({
         title: "Item adicionado",
