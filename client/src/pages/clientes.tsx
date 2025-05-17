@@ -17,10 +17,14 @@ import {
   Search, 
   FileDown,
   Edit,
-  Trash2
+  Trash2,
+  UserRound
 } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { type Cliente } from "@shared/schema";
+import { NovoClienteDialog } from "@/components/clientes/novo-cliente-dialog";
+import { EditarClienteDialog } from "@/components/clientes/editar-cliente-dialog";
+import { ExcluirClienteDialog } from "@/components/clientes/excluir-cliente-dialog";
 
 export default function Clientes() {
   const [filtro, setFiltro] = useState("");
@@ -43,9 +47,7 @@ export default function Clientes() {
           <h1 className="text-2xl font-heading font-bold text-neutral-darkest">Clientes</h1>
           <p className="text-neutral-dark">Gerencie os clientes do seu restaurante</p>
         </div>
-        <Button className="bg-primary hover:bg-primary-dark text-white">
-          <Plus className="mr-2 h-4 w-4" /> Novo Cliente
-        </Button>
+        <NovoClienteDialog />
       </div>
       
       <div className="flex justify-between items-center my-4">
@@ -119,12 +121,8 @@ export default function Clientes() {
                         <Button variant="ghost" size="icon">
                           <Eye className="h-4 w-4" />
                         </Button>
-                        <Button variant="ghost" size="icon">
-                          <Edit className="h-4 w-4" />
-                        </Button>
-                        <Button variant="ghost" size="icon" className="text-destructive">
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
+                        <EditarClienteDialog cliente={cliente} />
+                        <ExcluirClienteDialog cliente={cliente} />
                       </div>
                     </TableCell>
                   </TableRow>
