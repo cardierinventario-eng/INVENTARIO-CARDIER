@@ -37,7 +37,7 @@ export function ExcluirPedidoDialog({ pedido, trigger, onDelete }: ExcluirPedido
     setIsSubmitting(true);
     try {
       // Excluir o pedido
-      await apiRequest("DELETE", `/api/pedidos/${pedido.id}`);
+      await apiRequest(`/api/pedidos/${pedido.id}`, "DELETE");
       
       toast({
         title: "Pedido excluído",
