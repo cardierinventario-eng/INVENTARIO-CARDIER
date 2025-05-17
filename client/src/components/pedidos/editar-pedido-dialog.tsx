@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useQueryClient, useQuery } from "@tanstack/react-query";
+import { useQueryClient } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -13,7 +13,6 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import {
@@ -32,8 +31,6 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import { Input } from "@/components/ui/input";
-import { Edit2 } from "lucide-react";
 
 // Schema de validação
 const formSchema = z.object({
@@ -46,11 +43,11 @@ type FormValues = z.infer<typeof formSchema>;
 
 interface EditarPedidoDialogProps {
   pedido: any;
-  trigger?: React.ReactNode;
+  isOpen: boolean;
+  onOpenChange: (open: boolean) => void;
 }
 
-export function EditarPedidoDialog({ pedido, trigger }: EditarPedidoDialogProps) {
-  const [isOpen, setIsOpen] = useState(false);
+export function EditarPedidoDialog({ pedido, isOpen, onOpenChange }: EditarPedidoDialogProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const queryClient = useQueryClient();
   const { toast } = useToast();
@@ -58,9 +55,9 @@ export function EditarPedidoDialog({ pedido, trigger }: EditarPedidoDialogProps)
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      formaPagamento: pedido.formaPagamento || "dinheiro",
-      observacoes: pedido.observacoes || "",
-      status: pedido.status || "pendente",
+      formaPagamento: pedido?.formaPagamento || "dinheiro",
+      observacoes: pedido?.observacoes || "",
+      status: pedido?.status || "pendente",
     },
   });
 
@@ -76,6 +73,8 @@ export function EditarPedidoDialog({ pedido, trigger }: EditarPedidoDialogProps)
   }, [pedido, form]);
 
   const onSubmit = async (data: FormValues) => {
+    if (!pedido?.id) return;
+
     setIsSubmitting(true);
     try {
       // Atualizar o pedido
@@ -90,9 +89,10 @@ export function EditarPedidoDialog({ pedido, trigger }: EditarPedidoDialogProps)
       // Invalidar cache para atualizar listagens
       queryClient.invalidateQueries({ queryKey: ['/api/pedidos'] });
       queryClient.invalidateQueries({ queryKey: ['/api/pedidos/recentes'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/dashboard/stats'] });
       
       // Fechar modal
-      setIsOpen(false);
+      onOpenChange(false);
     } catch (error) {
       console.error("Erro ao atualizar pedido:", error);
       toast({
@@ -106,17 +106,10 @@ export function EditarPedidoDialog({ pedido, trigger }: EditarPedidoDialogProps)
   };
 
   return (
-    <Dialog open={isOpen} onOpenChange={setIsOpen}>
-      <DialogTrigger asChild>
-        {trigger || (
-          <Button variant="outline" size="sm" className="h-8 w-8 p-0">
-            <Edit2 className="h-4 w-4" />
-          </Button>
-        )}
-      </DialogTrigger>
+    <Dialog open={isOpen} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[500px]">
         <DialogHeader>
-          <DialogTitle>Editar Pedido #{pedido.numero}</DialogTitle>
+          <DialogTitle>Editar Pedido #{pedido?.numero}</DialogTitle>
           <DialogDescription>
             Atualize as informações deste pedido conforme necessário.
           </DialogDescription>
@@ -203,7 +196,7 @@ export function EditarPedidoDialog({ pedido, trigger }: EditarPedidoDialogProps)
               <Button 
                 type="button" 
                 variant="outline" 
-                onClick={() => setIsOpen(false)}
+                onClick={() => onOpenChange(false)}
                 disabled={isSubmitting}
               >
                 Cancelar

@@ -31,6 +31,8 @@ import { type Pedido } from "@shared/schema";
 
 export default function Pedidos() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [pedidoSelecionado, setPedidoSelecionado] = useState<any>(null);
   const [filtroStatus, setFiltroStatus] = useState<string>("todos");
   const [filtroTexto, setFiltroTexto] = useState<string>("");
   
@@ -156,14 +158,17 @@ export default function Pedidos() {
                               </Link>
                             </Button>
                             
-                            <EditarPedidoDialog 
-                              pedido={pedido} 
-                              trigger={
-                                <Button variant="ghost" size="icon" className="h-8 w-8">
-                                  <Edit2 className="h-4 w-4" />
-                                </Button>
-                              }
-                            />
+                            <Button 
+                              variant="ghost" 
+                              size="icon" 
+                              className="h-8 w-8"
+                              onClick={() => {
+                                setPedidoSelecionado(pedido);
+                                setIsEditModalOpen(true);
+                              }}
+                            >
+                              <Edit2 className="h-4 w-4" />
+                            </Button>
                             
                             <ExcluirPedidoDialog 
                               pedido={pedido}
@@ -195,6 +200,14 @@ export default function Pedidos() {
         open={isDialogOpen} 
         onOpenChange={setIsDialogOpen} 
       />
+      
+      {pedidoSelecionado && (
+        <EditarPedidoDialog 
+          pedido={pedidoSelecionado}
+          isOpen={isEditModalOpen}
+          onOpenChange={setIsEditModalOpen}
+        />
+      )}
     </>
   );
 }
