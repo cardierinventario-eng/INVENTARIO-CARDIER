@@ -28,6 +28,7 @@ import { Eye, Plus, Search, FileDown, Printer, Edit2, Trash2 } from "lucide-reac
 import { PrintButton } from "@/components/shared/print-button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { type Pedido } from "@shared/schema";
+import { ComprovanteImpressao } from "@/components/pedidos/comprovante-impressao";
 
 export default function Pedidos() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);

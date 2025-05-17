@@ -11,6 +11,8 @@ import {
 import { Button } from "@/components/ui/button";
 import { StatusBadge } from "@/components/ui/status-badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Plus } from "lucide-react";
+import { NovaMesaDialog } from "@/components/mesas/nova-mesa-dialog";
 import { 
   Dialog,
   DialogContent,
@@ -58,9 +60,12 @@ export default function Mesas() {
 
   return (
     <>
-      <div className="mb-6">
-        <h1 className="text-2xl font-heading font-bold text-neutral-darkest">Mesas</h1>
-        <p className="text-neutral-dark">Gerencie as mesas do restaurante</p>
+      <div className="mb-6 flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-heading font-bold text-neutral-darkest">Mesas</h1>
+          <p className="text-neutral-dark">Gerencie as mesas do restaurante</p>
+        </div>
+        <NovaMesaDialog />
       </div>
       
       <Tabs defaultValue="todos" className="mb-6">
@@ -184,6 +189,10 @@ export default function Mesas() {
                     <Button 
                       variant="outline"
                       className="border-primary text-primary hover:bg-primary/10"
+                      onClick={() => {
+                        // Navegar para os pedidos da mesa
+                        window.location.href = `/pedidos?mesa=${mesa.id}`;
+                      }}
                     >
                       Ver Pedido
                     </Button>
