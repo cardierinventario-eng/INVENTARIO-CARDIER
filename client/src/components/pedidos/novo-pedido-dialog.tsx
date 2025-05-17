@@ -824,7 +824,20 @@ export function NovoPedidoDialog({
                 </div>
                 
                 <DialogFooter>
-                  <Button type="button" variant="outline" onClick={() => setIsOpen(false)}>
+                  <Button 
+                    type="button" 
+                    variant="outline" 
+                    onClick={() => {
+                      setIsOpen(false);
+                      // Se veio da página de mesas, redirecionar de volta
+                      if (veioDeMesas) {
+                        window.location.href = '/mesas';
+                      } else {
+                        // Redirecionar para dashboard
+                        window.location.href = '/';
+                      }
+                    }}
+                  >
                     Cancelar
                   </Button>
                   <Button 
