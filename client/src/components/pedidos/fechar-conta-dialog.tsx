@@ -89,13 +89,13 @@ export function FecharContaDialog({
       setIsSubmitting(true);
       
       // 1. Atualizar status do pedido para 'finalizado'
-      await apiRequest("PATCH", `/api/pedidos/${pedidoId}/status`, {
+      await apiRequest(`/api/pedidos/${pedidoId}/status`, "PATCH", {
         status: "finalizado",
         formaPagamento
       });
       
       // 2. Liberar a mesa
-      await apiRequest("PATCH", `/api/mesas/${mesaId}/status`, {
+      await apiRequest(`/api/mesas/${mesaId}/status`, "PATCH", {
         status: "livre"
       });
       
