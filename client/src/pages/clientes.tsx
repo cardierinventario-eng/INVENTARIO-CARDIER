@@ -25,6 +25,7 @@ import { type Cliente } from "@shared/schema";
 import { NovoClienteDialog } from "@/components/clientes/novo-cliente-dialog";
 import { EditarClienteDialog } from "@/components/clientes/editar-cliente-dialog";
 import { ExcluirClienteDialog } from "@/components/clientes/excluir-cliente-dialog";
+import { VisualizarClienteDialog } from "@/components/clientes/visualizar-cliente-dialog";
 
 export default function Clientes() {
   const [filtro, setFiltro] = useState("");
@@ -118,9 +119,7 @@ export default function Clientes() {
                     </TableCell>
                     <TableCell className="text-right">
                       <div className="flex justify-end space-x-1">
-                        <Button variant="ghost" size="icon">
-                          <Eye className="h-4 w-4" />
-                        </Button>
+                        <VisualizarClienteDialog cliente={cliente} />
                         <EditarClienteDialog cliente={cliente} />
                         <ExcluirClienteDialog cliente={cliente} />
                       </div>
