@@ -24,11 +24,12 @@ import { formatCurrency, formatDateTime } from "@/lib/utils";
 import { NovoPedidoDialog } from "@/components/pedidos/novo-pedido-dialog";
 import { EditarPedidoDialog } from "@/components/pedidos/editar-pedido-dialog";
 import { ExcluirPedidoDialog } from "@/components/pedidos/excluir-pedido-dialog";
-import { Eye, Plus, Search, FileDown, Printer, Edit2, Trash2 } from "lucide-react";
+import { Eye, Plus, Search, FileDown, Printer, Edit2, Trash2, CreditCard } from "lucide-react";
 import { PrintButton } from "@/components/shared/print-button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { type Pedido } from "@shared/schema";
 import { ComprovanteImpressao } from "@/components/pedidos/comprovante-impressao";
+import { FecharContaDialog } from "@/components/pedidos/fechar-conta-dialog";
 
 export default function Pedidos() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -168,6 +169,19 @@ export default function Pedidos() {
                                 </Button>
                               }
                             />
+                            
+                            {/* Botão de fechar conta (apenas para pedidos de mesa) */}
+                            {pedido.tipo === "mesa" && pedido.status !== "finalizado" && (
+                              <FecharContaDialog
+                                pedidoId={pedido.id}
+                                mesaId={pedido.mesaId || 0}
+                                trigger={
+                                  <Button variant="ghost" size="icon" className="h-8 w-8 text-primary">
+                                    <CreditCard className="h-4 w-4" />
+                                  </Button>
+                                }
+                              />
+                            )}
                             
                             <Button 
                               variant="ghost" 
