@@ -24,6 +24,7 @@ import { formatCurrency, formatDateTime } from "@/lib/utils";
 import { NovoPedidoDialog } from "@/components/pedidos/novo-pedido-dialog";
 import { EditarPedidoDialog } from "@/components/pedidos/editar-pedido-dialog";
 import { ExcluirPedidoDialog } from "@/components/pedidos/excluir-pedido-dialog";
+import { VisualizarPedidoDialog } from "@/components/pedidos/visualizar-pedido-dialog";
 import { Eye, Plus, Search, FileDown, Printer, Edit2, Trash2, CreditCard } from "lucide-react";
 import { PrintButton } from "@/components/shared/print-button";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -34,6 +35,7 @@ import { FecharContaDialog } from "@/components/pedidos/fechar-conta-dialog";
 export default function Pedidos() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [isViewModalOpen, setIsViewModalOpen] = useState(false);
   const [pedidoSelecionado, setPedidoSelecionado] = useState<any>(null);
   const [filtroStatus, setFiltroStatus] = useState<string>("todos");
   const [filtroTexto, setFiltroTexto] = useState<string>("");
@@ -48,6 +50,12 @@ export default function Pedidos() {
   
   // Converter mesaId para número se existir
   const mesaId = mesaIdParam ? parseInt(mesaIdParam) : undefined;
+  
+  // Função para abrir o diálogo de visualização de pedido
+  const handleVisualizarPedido = (pedido: any) => {
+    setPedidoSelecionado(pedido);
+    setIsViewModalOpen(true);
+  };
   
   // Função para voltar para a página de mesas
   const voltarParaMesas = () => {
@@ -180,11 +188,9 @@ export default function Pedidos() {
                               variant="ghost" 
                               size="icon"
                               className="h-8 w-8"
-                              asChild
+                              onClick={() => handleVisualizarPedido(pedido)}
                             >
-                              <Link href={`/pedidos/${pedido.id}`}>
-                                <Eye className="h-4 w-4" />
-                              </Link>
+                              <Eye className="h-4 w-4" />
                             </Button>
                             
                             <ComprovanteImpressao 
@@ -260,6 +266,14 @@ export default function Pedidos() {
           pedido={pedidoSelecionado}
           isOpen={isEditModalOpen}
           onOpenChange={setIsEditModalOpen}
+        />
+      )}
+      
+      {pedidoSelecionado && (
+        <VisualizarPedidoDialog
+          pedidoId={pedidoSelecionado.id}
+          aberto={isViewModalOpen}
+          aoFechar={() => setIsViewModalOpen(false)}
         />
       )}
     </>

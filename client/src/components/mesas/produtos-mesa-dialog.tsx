@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
@@ -53,7 +53,7 @@ export function ProdutosMesaDialog({ mesa, trigger }: ProdutosMesaDialogProps) {
   const [itensSelecionados, setItensSelecionados] = useState<ItemProduto[]>([]);
   
   // Use uma ref para o botão trigger personalizado
-  const triggerRef = React.useRef<HTMLButtonElement>(null);
+  const triggerRef = useRef<HTMLButtonElement>(null);
   
   const { toast } = useToast();
   const queryClient = useQueryClient();
