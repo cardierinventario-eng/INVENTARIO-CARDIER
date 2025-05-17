@@ -30,7 +30,8 @@ import {
   Printer,
   Palette,
   Shield,
-  HelpCircle
+  HelpCircle,
+  Plus
 } from "lucide-react";
 
 export default function Configuracoes() {
