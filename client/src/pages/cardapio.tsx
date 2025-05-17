@@ -28,6 +28,8 @@ import {
 import { formatCurrency } from "@/lib/utils";
 import { Skeleton } from "@/components/ui/skeleton";
 import { NovoItemDialog } from "@/components/cardapio/novo-item-dialog";
+import { EditarItemDialog } from "@/components/cardapio/editar-item-dialog";
+import { ExcluirItemDialog } from "@/components/cardapio/excluir-item-dialog";
 import { type ItemCardapio } from "@shared/schema";
 
 export default function Cardapio() {
@@ -146,9 +148,10 @@ export default function Cardapio() {
                     </p>
                   </CardContent>
                   <CardFooter className="pt-2 justify-between">
-                    <Button variant="outline" size="sm">
-                      <Edit className="h-4 w-4 mr-1" /> Editar
-                    </Button>
+                    <EditarItemDialog 
+                      item={item} 
+                      categorias={categorias}
+                    />
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
                         <Button variant="ghost" size="icon">
@@ -159,9 +162,14 @@ export default function Cardapio() {
                         <DropdownMenuItem>
                           <Eye className="h-4 w-4 mr-2" /> Visualizar
                         </DropdownMenuItem>
-                        <DropdownMenuItem className="text-destructive">
-                          <Trash2 className="h-4 w-4 mr-2" /> Excluir
-                        </DropdownMenuItem>
+                        <ExcluirItemDialog 
+                          item={item}
+                          trigger={
+                            <DropdownMenuItem className="text-destructive" onSelect={(e) => e.preventDefault()}>
+                              <Trash2 className="h-4 w-4 mr-2" /> Excluir
+                            </DropdownMenuItem>
+                          } 
+                        />
                       </DropdownMenuContent>
                     </DropdownMenu>
                   </CardFooter>
