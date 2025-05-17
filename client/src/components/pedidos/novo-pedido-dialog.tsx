@@ -202,6 +202,7 @@ export function NovoPedidoDialog({ open = false, onOpenChange }: NovoPedidoDialo
   }, 0);
 
   const onSubmit = async (data: FormValues) => {
+    // Validar se há itens no pedido
     if (itensSelecionados.length === 0) {
       toast({
         title: "Erro",
@@ -216,52 +217,68 @@ export function NovoPedidoDialog({ open = false, onOpenChange }: NovoPedidoDialo
       // Criar o pedido primeiro
       const novoPedido = {
         ...data,
-        numero: Math.floor(Math.random() * 10000), // Número aleatório para o pedido
+        numero: Math.floor(Math.random() * 90000) + 10000, // Número de 5 dígitos
+        data: new Date(),
         valorTotal: valorTotal.toString(),
         status: "pendente",
       };
 
       console.log("Enviando pedido:", novoPedido);
       
-      try {
-        const pedidoCriado: any = await apiRequest("POST", "/api/pedidos", novoPedido);
-        
-        // Adicionar itens ao pedido
-        if (pedidoCriado && typeof pedidoCriado === 'object' && pedidoCriado.id) {
-          const pedidoId = pedidoCriado.id;
-          
-          // Adicionar itens ao pedido
-          const promisesItens = itensSelecionados.map(item => 
-            apiRequest("POST", `/api/pedidos/${pedidoId}/itens`, {
-              pedidoId,
-              itemId: item.id,
-              nome: item.nome,
-              preco: typeof item.preco === 'string' ? item.preco : item.preco.toString(),
-              quantidade: item.quantidade
-            })
-          );
-          
-          await Promise.all(promisesItens);
-          
-          toast({
-            title: "Pedido criado",
-            description: "O pedido foi registrado com sucesso",
-            variant: "success",
-          });
-          
-          // Invalidar cache para atualizar listagens
-          queryClient.invalidateQueries({ queryKey: ['/api/pedidos'] });
-          queryClient.invalidateQueries({ queryKey: ['/api/pedidos/recentes'] });
-        } else {
-          throw new Error("Falha ao criar pedido: resposta inválida do servidor");
-        }
-      } catch (error) {
-        console.error("Erro ao processar pedido:", error);
-        throw error; // Re-throw para ser capturado pelo try/catch externo
+      // Criar o pedido no servidor
+      const response = await apiRequest("POST", "/api/pedidos", novoPedido);
+      
+      // Verificar se a resposta é válida
+      if (!response || typeof response !== 'object') {
+        throw new Error("Resposta inválida do servidor ao criar pedido");
       }
+      
+      // Obter o ID do pedido criado com type assertion
+      const typedResponse = response as { id: number };
+      const pedidoId = typedResponse.id;
+      
+      if (!pedidoId) {
+        throw new Error("ID do pedido não retornado pelo servidor");
+      }
+      
+      // Criar os itens do pedido
+      for (const item of itensSelecionados) {
+        await apiRequest("POST", "/api/pedidos/itens", {
+          pedidoId: pedidoId,
+          itemId: item.id,
+          nome: item.nome,
+          preco: typeof item.preco === 'string' ? item.preco : item.preco.toString(),
+          quantidade: item.quantidade
+        });
+      }
+      
+      // Se for um pedido de mesa, atualizar o status da mesa para ocupada
+      if (data.tipo === "mesa" && data.mesaId) {
+        await apiRequest("PATCH", `/api/mesas/${data.mesaId}/status`, {
+          status: "ocupada"
+        });
+        
+        // Invalidar cache de mesas
+        queryClient.invalidateQueries({ queryKey: ['/api/mesas'] });
+      }
+      
+      // Notificar sucesso
+      toast({
+        title: "Pedido criado",
+        description: "O pedido foi registrado com sucesso",
+        variant: "success",
+      });
+      
+      // Invalidar caches para atualizar listagens
+      queryClient.invalidateQueries({ queryKey: ['/api/pedidos'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/pedidos/recentes'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/dashboard/stats'] });
       
       // Fechar modal e resetar form
       setIsOpen(false);
+      form.reset();
+      setItensSelecionados([]);
+      
     } catch (error) {
       console.error("Erro ao criar pedido:", error);
       toast({

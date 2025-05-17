@@ -423,6 +423,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(400).json({ message: "Dados inválidos", error });
     }
   });
+  
+  // Nova rota para criar itens de pedido diretamente
+  app.post("/api/pedidos/itens", async (req, res) => {
+    try {
+      const data = insertItemPedidoSchema.parse(req.body);
+      const item = await storage.createItemPedido(data);
+      res.status(201).json(item);
+    } catch (error) {
+      res.status(400).json({ message: "Dados inválidos", error });
+    }
+  });
 
   app.delete("/api/pedidos/itens/:id", async (req, res) => {
     const id = parseInt(req.params.id);

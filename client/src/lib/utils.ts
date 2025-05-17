@@ -31,25 +31,25 @@ export function formatDateTime(date: Date): string {
 }
 
 export function getStatusColor(status: string): {
-  bg: string,
-  text: string
+  bgColor: string,
+  textColor: string
 } {
   switch (status.toLowerCase()) {
     case 'novo':
-      return { bg: 'bg-primary/20', text: 'text-primary' };
+      return { bgColor: 'bg-primary/20', textColor: 'text-primary' };
     case 'em preparo':
     case 'pendente':
-      return { bg: 'bg-warning/20', text: 'text-warning' };
+      return { bgColor: 'bg-amber-100', textColor: 'text-amber-800' };
     case 'pago':
     case 'finalizado':
-      return { bg: 'bg-info/20', text: 'text-info' };
+      return { bgColor: 'bg-blue-100', textColor: 'text-blue-800' };
     case 'entregue':
     case 'completo':
-      return { bg: 'bg-success/20', text: 'text-success' };
+      return { bgColor: 'bg-green-100', textColor: 'text-green-800' };
     case 'cancelado':
-      return { bg: 'bg-destructive/20', text: 'text-destructive' };
+      return { bgColor: 'bg-red-100', textColor: 'text-red-800' };
     default:
-      return { bg: 'bg-neutral-medium/20', text: 'text-neutral-dark' };
+      return { bgColor: 'bg-gray-100', textColor: 'text-gray-800' };
   }
 }
 
