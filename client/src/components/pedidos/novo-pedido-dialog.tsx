@@ -202,7 +202,6 @@ export function NovoPedidoDialog({ open = false, onOpenChange }: NovoPedidoDialo
   }, 0);
 
   const onSubmit = async (data: FormValues) => {
-    // Validar se há itens no pedido
     if (itensSelecionados.length === 0) {
       toast({
         title: "Erro",
@@ -214,10 +213,10 @@ export function NovoPedidoDialog({ open = false, onOpenChange }: NovoPedidoDialo
 
     setIsSubmitting(true);
     try {
-      // Criar o pedido primeiro
+      // Criar pedido
       const novoPedido = {
         ...data,
-        numero: Math.floor(Math.random() * 90000) + 10000, // Número de 5 dígitos
+        numero: Math.floor(Math.random() * 10000), // Número aleatório para o pedido
         data: new Date(),
         valorTotal: valorTotal.toString(),
         status: "pendente",
@@ -225,60 +224,54 @@ export function NovoPedidoDialog({ open = false, onOpenChange }: NovoPedidoDialo
 
       console.log("Enviando pedido:", novoPedido);
       
-      // Criar o pedido no servidor
+      // Usando type assertion para tratar corretamente a resposta
       const response = await apiRequest("POST", "/api/pedidos", novoPedido);
       
-      // Verificar se a resposta é válida
-      if (!response || typeof response !== 'object') {
-        throw new Error("Resposta inválida do servidor ao criar pedido");
+      // Converter para tipo desconhecido primeiro e depois para o tipo específico
+      const pedidoCriado = response as unknown as { id: number };
+      
+      if (!pedidoCriado || !pedidoCriado.id) {
+        throw new Error("Erro ao criar pedido: resposta inválida");
       }
       
-      // Obter o ID do pedido criado com type assertion
-      const typedResponse = response as { id: number };
-      const pedidoId = typedResponse.id;
+      // Adicionar itens ao pedido
+      const pedidoId = pedidoCriado.id;
       
-      if (!pedidoId) {
-        throw new Error("ID do pedido não retornado pelo servidor");
-      }
-      
-      // Criar os itens do pedido
       for (const item of itensSelecionados) {
-        await apiRequest("POST", "/api/pedidos/itens", {
-          pedidoId: pedidoId,
-          itemId: item.id,
-          nome: item.nome,
-          preco: typeof item.preco === 'string' ? item.preco : item.preco.toString(),
-          quantidade: item.quantidade
-        });
+        try {
+          await apiRequest("POST", `/api/pedidos/${pedidoId}/itens`, {
+            pedidoId,
+            itemId: item.id,
+            nome: item.nome,
+            preco: typeof item.preco === 'string' ? item.preco : item.preco.toString(),
+            quantidade: item.quantidade
+          });
+        } catch (itemError) {
+          console.error("Erro ao adicionar item ao pedido:", itemError);
+        }
       }
       
-      // Se for um pedido de mesa, atualizar o status da mesa para ocupada
-      if (data.tipo === "mesa" && data.mesaId) {
-        await apiRequest("PATCH", `/api/mesas/${data.mesaId}/status`, {
-          status: "ocupada"
-        });
-        
-        // Invalidar cache de mesas
-        queryClient.invalidateQueries({ queryKey: ['/api/mesas'] });
-      }
-      
-      // Notificar sucesso
       toast({
         title: "Pedido criado",
         description: "O pedido foi registrado com sucesso",
         variant: "success",
       });
       
-      // Invalidar caches para atualizar listagens
+      // Atualizar status da mesa se necessário
+      if (data.tipo === "mesa" && data.mesaId) {
+        await apiRequest("PATCH", `/api/mesas/${data.mesaId}/status`, {
+          status: "ocupada"
+        });
+      }
+      
+      // Invalidar cache para atualizar listagens
       queryClient.invalidateQueries({ queryKey: ['/api/pedidos'] });
       queryClient.invalidateQueries({ queryKey: ['/api/pedidos/recentes'] });
       queryClient.invalidateQueries({ queryKey: ['/api/dashboard/stats'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/mesas'] });
       
       // Fechar modal e resetar form
       setIsOpen(false);
-      form.reset();
-      setItensSelecionados([]);
-      
     } catch (error) {
       console.error("Erro ao criar pedido:", error);
       toast({
