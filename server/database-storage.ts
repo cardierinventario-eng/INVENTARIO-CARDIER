@@ -537,18 +537,44 @@ export class DatabaseStorage implements IStorage {
   }
 
   async deletePedido(id: number): Promise<boolean> {
-    // Primeiro verificar se existe pedido e obter dados
-    const [pedido] = await db
-      .select()
-      .from(pedidos)
-      .where(eq(pedidos.id, id));
-    
-    if (pedido && pedido.tipo === "mesa" && pedido.mesaId) {
-      await this.updateMesaStatus(pedido.mesaId, "livre");
+    try {
+      // Primeiro verificar se existe pedido e obter dados
+      const [pedido] = await db
+        .select()
+        .from(pedidos)
+        .where(eq(pedidos.id, id));
+      
+      if (!pedido) {
+        console.log(`Pedido com ID ${id} não encontrado para exclusão.`);
+        return false;
+      }
+
+      // Iniciar uma transação para garantir que todas as operações sejam concluídas com sucesso
+      await db.transaction(async (tx) => {
+        // 1. Primeiro excluir todos os itens do pedido
+        console.log(`Excluindo itens do pedido ${id}...`);
+        await tx.delete(itensPedido).where(eq(itensPedido.pedidoId, id));
+        
+        // 2. Excluir o pedido
+        console.log(`Excluindo pedido ${id}...`);
+        await tx.delete(pedidos).where(eq(pedidos.id, id));
+        
+        // 3. Se for pedido de mesa, atualizar o status da mesa para livre
+        if (pedido.tipo === "mesa" && pedido.mesaId) {
+          console.log(`Liberando mesa ${pedido.mesaId}...`);
+          await tx
+            .update(mesas)
+            .set({ status: "livre" })
+            .where(eq(mesas.id, pedido.mesaId));
+        }
+      });
+      
+      console.log(`Pedido ${id} excluído com sucesso.`);
+      return true;
+    } catch (error) {
+      console.error(`Erro ao excluir pedido ${id}:`, error);
+      return false;
     }
-    
-    const result = await db.delete(pedidos).where(eq(pedidos.id, id));
-    return result.rowCount > 0;
   }
 
   // Implementação de Itens do Pedido
