@@ -40,21 +40,13 @@ import { eq, desc, lt, and, sql, gte, asc } from "drizzle-orm";
 import { IStorage } from "./storage";
 
 export class DatabaseStorage implements IStorage {
-  // Propriedade para rastrear o zeramento do relatório de vendas
-  private relatorioVendasZerado: {
-    data: Date;
-    vendasPorDia: Array<{data: string, total: number, quantidade: number}>;
-    vendasPorCategoria: Array<{categoria: string, total: number, quantidade: number}>;
-    produtosMaisVendidos: Array<{produto: string, quantidade: number, total: number}>;
-  } | null = null;
-  
-  // Propriedade para rastrear o zeramento do relatório financeiro
-  private relatorioFinanceiroZerado: {
-    data: Date;
-    receitasPorDia: Array<{data: string, valor: number}>;
-    despesasPorCategoria: Array<{categoria: string, valor: number}>;
-    resumoMensal: {receitas: number, despesas: number, lucro: number};
-  } | null = null;
+  // As propriedades para rastreamento de zeramento foram movidas para o banco de dados
+  // e agora são armazenadas na tabela 'configuracoes' 
+  // com os campos:
+  // - dataZeramentoVendas
+  // - dataZeramentoFinanceiro
+  // - relatorioVendasZerado (JSON)
+  // - relatorioFinanceiroZerado (JSON)
 
   constructor() {
     // Inicializar o banco de dados se necessário
@@ -67,6 +59,8 @@ export class DatabaseStorage implements IStorage {
       const adminUsers = await db.select().from(users).where(eq(users.username, "admin"));
       
       if (adminUsers.length === 0) {
+        console.log("Inicializando banco de dados com dados padrão...");
+        
         // Criar usuário admin padrão
         await db.insert(users).values({
           username: "admin",
@@ -76,7 +70,66 @@ export class DatabaseStorage implements IStorage {
           email: "admin@lanchefacil.com.br"
         });
 
-        // Criar configuração padrão
+        // Gerar dados de vendas por dia zerados (últimos 7 dias)
+        const vendasPorDia = [];
+        for (let i = 6; i >= 0; i--) {
+          const data = new Date();
+          data.setDate(data.getDate() - i);
+          const dataFormatada = `${data.getDate().toString().padStart(2, '0')}/${(data.getMonth() + 1).toString().padStart(2, '0')}`;
+          vendasPorDia.push({
+            data: dataFormatada,
+            total: 0,
+            quantidade: 0
+          });
+        }
+        
+        // Dados do relatório de vendas zerado
+        const relatorioVendasZerado = {
+          data: new Date(),
+          vendasPorDia: vendasPorDia,
+          vendasPorCategoria: [
+            { categoria: "Lanches", total: 0, quantidade: 0 },
+            { categoria: "Porções", total: 0, quantidade: 0 },
+            { categoria: "Bebidas", total: 0, quantidade: 0 },
+            { categoria: "Sobremesas", total: 0, quantidade: 0 },
+            { categoria: "Combos", total: 0, quantidade: 0 }
+          ],
+          produtosMaisVendidos: []
+        };
+        
+        // Gerar dados financeiros zerados (últimos 30 dias)
+        const receitasPorDia = [];
+        for (let i = 29; i >= 0; i--) {
+          const data = new Date();
+          data.setDate(data.getDate() - i);
+          const dataFormatada = `${data.getDate().toString().padStart(2, '0')}/${(data.getMonth() + 1).toString().padStart(2, '0')}`;
+          receitasPorDia.push({
+            data: dataFormatada,
+            valor: 0
+          });
+        }
+        
+        // Dados do relatório financeiro zerado
+        const relatorioFinanceiroZerado = {
+          data: new Date(),
+          receitasPorDia: receitasPorDia,
+          despesasPorCategoria: [
+            { categoria: "Ingredientes", valor: 0 },
+            { categoria: "Salários", valor: 0 },
+            { categoria: "Aluguel", valor: 0 },
+            { categoria: "Água/Luz", valor: 0 },
+            { categoria: "Marketing", valor: 0 },
+            { categoria: "Equipamentos", valor: 0 },
+            { categoria: "Outros", valor: 0 }
+          ],
+          resumoMensal: {
+            receitas: 0,
+            despesas: 0,
+            lucro: 0
+          }
+        };
+
+        // Criar configuração padrão com relatórios zerados
         await db.insert(configuracoes).values({
           nomeEmpresa: "Lanche Fácil",
           cnpj: "12.345.678/0001-90",
@@ -86,8 +139,14 @@ export class DatabaseStorage implements IStorage {
           taxaServicoDefault: "10.00",
           logotipo: "",
           tema: "claro",
-          moeda: "BRL"
+          moeda: "BRL",
+          dataZeramentoVendas: new Date(),
+          dataZeramentoFinanceiro: new Date(),
+          relatorioVendasZerado,
+          relatorioFinanceiroZerado
         });
+        
+        console.log("Banco de dados inicializado com sucesso!");
       }
     } catch (error) {
       console.error("Erro ao inicializar banco de dados:", error);
@@ -712,13 +771,20 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getRelatorioFinanceiro(): Promise<RelatorioFinanceiro> {
-    // Verificar se o relatório financeiro foi zerado
-    if (this.relatorioFinanceiroZerado) {
-      console.log("Retornando dados do marco zero financeiro");
+    // Buscar configuração para verificar se o relatório foi zerado
+    const config = await this.getConfiguracao();
+    
+    // Verificar se o relatório financeiro foi zerado e temos dados no banco
+    if (config?.dataZeramentoFinanceiro && config?.relatorioFinanceiroZerado) {
+      console.log("Retornando dados do marco zero financeiro do banco de dados");
+      
+      // Usar os dados persistentes do banco
+      const relatorioZerado = config.relatorioFinanceiroZerado as any;
+      
       return {
-        receitasPorDia: this.relatorioFinanceiroZerado.receitasPorDia,
-        despesasPorCategoria: this.relatorioFinanceiroZerado.despesasPorCategoria,
-        resumoMensal: this.relatorioFinanceiroZerado.resumoMensal
+        receitasPorDia: relatorioZerado.receitasPorDia || [],
+        despesasPorCategoria: relatorioZerado.despesasPorCategoria || [],
+        resumoMensal: relatorioZerado.resumoMensal || { receitas: 0, despesas: 0, lucro: 0 }
       };
     }
     
