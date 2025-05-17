@@ -246,7 +246,7 @@ export function ComprovanteImpressao({
       `;
     }
     
-    // Conteúdo do comprovante
+    // Conteúdo do comprovante sem elementos duplicados
     const content = `
       <!DOCTYPE html>
       <html>
@@ -256,6 +256,7 @@ export function ComprovanteImpressao({
       </head>
       <body>
         <div class="container">
+          <!-- Cabeçalho único e simplificado -->
           <div class="header">
             <div class="titulo">${titulo}</div>
             <div class="subtitulo">${subtitulo}</div>
