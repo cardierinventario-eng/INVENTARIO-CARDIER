@@ -13,7 +13,7 @@ import { StatusBadge } from "@/components/ui/status-badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Plus, ShoppingCart, Settings } from "lucide-react";
 import { NovaMesaDialog } from "@/components/mesas/nova-mesa-dialog";
-import { AdicionarProdutosMesaDialog } from "@/components/mesas/adicionar-produtos-mesa-dialog";
+import { ProdutosMesaDialog } from "@/components/mesas/produtos-mesa-dialog";
 import { 
   Dialog,
   DialogContent,
@@ -190,17 +190,18 @@ export default function Mesas() {
                   </Button>
                   
                   {/* Botão para adicionar produtos à mesa */}
-                  <Button 
-                    variant="default"
-                    className="gap-1 flex-1"
-                    onClick={() => {
-                      // Navegar para a página de pedidos com query para mesa
-                      window.location.href = `/pedidos?mesa=${mesa.id}&acao=adicionar`;
-                    }}
-                  >
-                    <ShoppingCart className="h-4 w-4" />
-                    Produtos
-                  </Button>
+                  <ProdutosMesaDialog 
+                    mesa={mesa}
+                    trigger={
+                      <Button 
+                        variant="default"
+                        className="gap-1 flex-1"
+                      >
+                        <ShoppingCart className="h-4 w-4" />
+                        Produtos
+                      </Button>
+                    }
+                  />
                   
                   {/* Botão para visualizar pedido da mesa, se estiver ocupada */}
                   {mesa.status.toLowerCase() === 'ocupada' && (
