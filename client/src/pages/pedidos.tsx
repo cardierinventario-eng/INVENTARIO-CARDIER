@@ -49,6 +49,11 @@ export default function Pedidos() {
   // Converter mesaId para número se existir
   const mesaId = mesaIdParam ? parseInt(mesaIdParam) : undefined;
   
+  // Função para voltar para a página de mesas
+  const voltarParaMesas = () => {
+    window.location.href = '/mesas';
+  };
+  
   const { data: pedidos, isLoading } = useQuery<Pedido[]>({
     queryKey: ['/api/pedidos'],
   });
@@ -76,12 +81,23 @@ export default function Pedidos() {
           <h1 className="text-2xl font-heading font-bold text-neutral-darkest">Pedidos</h1>
           <p className="text-neutral-dark">Gerencie todos os pedidos do restaurante</p>
         </div>
-        <Button 
-          className="bg-primary hover:bg-primary-dark text-white"
-          onClick={() => setIsDialogOpen(true)}
-        >
-          <Plus className="mr-2 h-4 w-4" /> Novo Pedido
-        </Button>
+        <div className="flex space-x-2">
+          {/* Botão para voltar às mesas se vier da página de mesas */}
+          {mostrarNovoPedido && (
+            <Button 
+              variant="outline"
+              onClick={voltarParaMesas}
+            >
+              Voltar para Mesas
+            </Button>
+          )}
+          <Button 
+            className="bg-primary hover:bg-primary-dark text-white"
+            onClick={() => setIsDialogOpen(true)}
+          >
+            <Plus className="mr-2 h-4 w-4" /> Novo Pedido
+          </Button>
+        </div>
       </div>
       
       <Tabs defaultValue="todos" className="mb-6">
