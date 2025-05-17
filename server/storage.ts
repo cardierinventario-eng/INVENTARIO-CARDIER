@@ -113,6 +113,14 @@ export class MemStorage implements IStorage {
     vendasPorCategoria: Array<{categoria: string, total: number, quantidade: number}>;
     produtosMaisVendidos: Array<{produto: string, quantidade: number, total: number}>;
   } | null = null;
+  
+  // Propriedade para rastrear o zeramento do relatório financeiro
+  private relatorioFinanceiroZerado: {
+    data: Date;
+    receitasPorDia: Array<{data: string, valor: number}>;
+    despesasPorCategoria: Array<{categoria: string, valor: number}>;
+    resumoMensal: {receitas: number, despesas: number, lucro: number};
+  } | null = null;
 
   private currentUserId: number;
   private currentClienteId: number;
@@ -802,7 +810,7 @@ export class MemStorage implements IStorage {
         });
       }
       
-      // Definir um "marco zero" para o relatório
+      // Definir um "marco zero" para o relatório de vendas
       this.relatorioVendasZerado = {
         data: new Date(), // Marca quando o relatório foi zerado
         vendasPorDia: vendasPorDia,
@@ -816,10 +824,45 @@ export class MemStorage implements IStorage {
         produtosMaisVendidos: []
       };
       
-      console.log("Relatório de vendas zerado com sucesso");
+      // Gerar dados financeiros zerados (últimos 30 dias)
+      const receitasPorDia = [];
+      for (let i = 29; i >= 0; i--) {
+        const data = new Date();
+        data.setDate(data.getDate() - i);
+        
+        // Formatar a data como DD/MM
+        const dataFormatada = `${data.getDate().toString().padStart(2, '0')}/${(data.getMonth() + 1).toString().padStart(2, '0')}`;
+        
+        receitasPorDia.push({
+          data: dataFormatada,
+          valor: 0
+        });
+      }
+      
+      // Definir um "marco zero" para o relatório financeiro
+      this.relatorioFinanceiroZerado = {
+        data: new Date(),
+        receitasPorDia: receitasPorDia,
+        despesasPorCategoria: [
+          { categoria: "Ingredientes", valor: 0 },
+          { categoria: "Salários", valor: 0 },
+          { categoria: "Aluguel", valor: 0 },
+          { categoria: "Água/Luz", valor: 0 },
+          { categoria: "Marketing", valor: 0 },
+          { categoria: "Equipamentos", valor: 0 },
+          { categoria: "Outros", valor: 0 }
+        ],
+        resumoMensal: {
+          receitas: 0,
+          despesas: 0,
+          lucro: 0
+        }
+      };
+      
+      console.log("Relatórios de vendas e financeiro zerados com sucesso");
       return true;
     } catch (error) {
-      console.error("Erro ao zerar relatório de vendas:", error);
+      console.error("Erro ao zerar relatórios:", error);
       return false;
     }
   }
