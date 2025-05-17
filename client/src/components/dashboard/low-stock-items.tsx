@@ -61,7 +61,7 @@ export function LowStockItems() {
       queryClient.invalidateQueries({ queryKey: ['/api/dashboard/stats'] });
       
       // Registra a movimentação de estoque
-      await apiRequest(`/api/estoque/movimentacoes`, 'POST', {
+      await apiRequest(`/api/estoque/movimentacao`, 'POST', {
         itemId: itemId,
         tipo: "entrada",
         quantidade: quantidade.toString(),

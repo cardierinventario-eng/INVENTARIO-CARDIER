@@ -78,18 +78,19 @@ export function AjustarEstoqueDialog({ item, children }: AjustarEstoqueDialogPro
       });
       
       // 2. Registrar a movimentação no histórico
-      await apiRequest(`/api/estoque/movimentacoes`, "POST", {
-        itemEstoqueId: item.id,
+      await apiRequest(`/api/estoque/movimentacao`, "POST", {
+        itemId: item.id,
         tipo: tipoMovimentacao,
-        quantidade,
-        responsavel: "Usuário",
-        observacoes: observacoes || `Ajuste manual de estoque: ${tipoMovimentacao}`
+        quantidade: quantidade.toString(),
+        usuarioId: 1,
+        motivo: observacoes || `Ajuste manual de estoque: ${tipoMovimentacao}`,
+        produto: item.nome
       });
       
       // Atualizar os dados
       queryClient.invalidateQueries({ queryKey: ['/api/estoque'] });
       queryClient.invalidateQueries({ queryKey: ['/api/estoque/baixo'] });
-      queryClient.invalidateQueries({ queryKey: ['/api/estoque/movimentacoes'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/estoque/movimentacao'] });
       queryClient.invalidateQueries({ queryKey: ['/api/dashboard/stats'] });
       
       toast({

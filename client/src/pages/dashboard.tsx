@@ -32,8 +32,7 @@ export default function Dashboard() {
       toast({
         title: "Alerta de Estoque",
         description: `${stats.itensEstoqueBaixo} ${stats.itensEstoqueBaixo === 1 ? "item está" : "itens estão"} com estoque abaixo do mínimo.`,
-        variant: "destructive",
-        icon: <AlertTriangle className="h-4 w-4" />
+        variant: "destructive"
       });
     }
   }, [stats?.itensEstoqueBaixo, toast]);
