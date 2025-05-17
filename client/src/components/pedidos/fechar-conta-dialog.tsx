@@ -78,10 +78,10 @@ export function FecharContaDialog({
   const isLoading = pedidoLoading || itensLoading || mesaLoading;
   
   // Calcular total do pedido
-  const valorTotal = itensPedido?.reduce((total: number, item: any) => {
+  const valorTotal = Array.isArray(itensPedido) ? itensPedido.reduce((total: number, item: any) => {
     const preco = typeof item.preco === 'string' ? parseFloat(item.preco) : item.preco;
     return total + (preco * item.quantidade);
-  }, 0);
+  }, 0) : 0;
   
   // Fechar a conta e liberar a mesa
   const handleFecharConta = async () => {
@@ -169,12 +169,13 @@ export function FecharContaDialog({
                     <CardHeader className="pb-2">
                       <CardTitle className="text-lg">Resumo do Pedido</CardTitle>
                       <CardDescription>
-                        Pedido #{pedido?.numero} - Mesa {mesa?.numero}
+                        {pedido ? `Pedido #${(pedido as any).numero || '-'}` : 'Carregando...'} - 
+                        {mesa ? `Mesa ${(mesa as any).numero || '-'}` : 'Carregando...'}
                       </CardDescription>
                     </CardHeader>
                     <CardContent className="pb-2">
                       <div className="space-y-1">
-                        {itensPedido.map((item: any, index: number) => (
+                        {Array.isArray(itensPedido) && itensPedido.map((item: any, index: number) => (
                           <div key={index} className="flex justify-between text-sm py-1">
                             <span>{item.quantidade}x {item.nome}</span>
                             <span>{formatCurrency(item.preco * item.quantidade)}</span>
@@ -196,7 +197,6 @@ export function FecharContaDialog({
                     <Select 
                       value={formaPagamento} 
                       onValueChange={setFormaPagamento}
-                      id="forma-pagamento"
                     >
                       <SelectTrigger>
                         <SelectValue placeholder="Selecione a forma de pagamento" />
