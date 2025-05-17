@@ -485,7 +485,7 @@ export function NovoPedidoDialog({
       console.log("Enviando pedido:", novoPedido);
       
       // Enviando pedido para o servidor
-      const pedidoCriado = await apiRequest("POST", "/api/pedidos", novoPedido);
+      const pedidoCriado = await apiRequest("/api/pedidos", "POST", novoPedido);
       
       console.log("Resposta do servidor:", pedidoCriado);
       
@@ -500,7 +500,7 @@ export function NovoPedidoDialog({
       try {
         // Usar endpoint simplificado com os campos corretos
         for (const item of itensSelecionados) {
-          await apiRequest("POST", "/api/pedidos/itens", {
+          await apiRequest("/api/pedidos/itens", "POST", {
             pedidoId: pedidoId,
             itemCardapioId: item.id,  // Nome correto do campo conforme o schema
             nome: item.nome,
@@ -523,7 +523,7 @@ export function NovoPedidoDialog({
       // Atualizar status da mesa se necessário
       try {
         if (data.tipo === "mesa" && data.mesaId) {
-          await apiRequest("PATCH", `/api/mesas/${data.mesaId}/status`, {
+          await apiRequest(`/api/mesas/${data.mesaId}/status`, "PATCH", {
             status: "ocupada"
           });
         }

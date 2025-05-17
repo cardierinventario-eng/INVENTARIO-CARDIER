@@ -67,7 +67,7 @@ export function NovaMesaDialog() {
         status: "livre",
       };
       
-      await apiRequest("POST", "/api/mesas", novaMesa);
+      await apiRequest("/api/mesas", "POST", novaMesa);
       
       toast({
         title: "Mesa adicionada",
