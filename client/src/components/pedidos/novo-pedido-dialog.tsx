@@ -291,7 +291,7 @@ export function NovoPedidoDialog({ open = false, onOpenChange }: NovoPedidoDialo
           <Plus className="mr-2 h-4 w-4" /> Novo Pedido
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[700px]">
+      <DialogContent className="sm:max-w-[700px] max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Novo Pedido</DialogTitle>
           <DialogDescription>
@@ -301,7 +301,7 @@ export function NovoPedidoDialog({ open = false, onOpenChange }: NovoPedidoDialo
         
         <div className="grid grid-cols-1 md:grid-cols-12 gap-4">
           {/* Seletor de itens */}
-          <div className="md:col-span-5 border rounded-md p-4 h-[400px] overflow-y-auto">
+          <div className="md:col-span-5 border rounded-md p-4 h-[300px] overflow-y-auto">
             <h3 className="font-semibold mb-2">Itens do Cardápio</h3>
             <div className="space-y-2">
               {itensCardapio.filter((item: any) => item.disponivel).map((item: any) => (
@@ -323,7 +323,7 @@ export function NovoPedidoDialog({ open = false, onOpenChange }: NovoPedidoDialo
           </div>
           
           {/* Resumo do pedido */}
-          <div className="md:col-span-7 border rounded-md p-4 h-[400px] flex flex-col">
+          <div className="md:col-span-7 border rounded-md p-4 h-[300px] flex flex-col">
             <h3 className="font-semibold mb-2">Itens do Pedido</h3>
             <div className="flex-grow overflow-y-auto">
               {itensSelecionados.length === 0 ? (
