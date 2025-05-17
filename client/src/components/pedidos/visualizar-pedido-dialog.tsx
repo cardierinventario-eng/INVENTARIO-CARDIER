@@ -45,7 +45,7 @@ export function VisualizarPedidoDialog({
     queryKey: ['/api/pedidos', pedidoId],
     queryFn: async () => {
       try {
-        const response = await apiRequest("GET", `/api/pedidos/${pedidoId}`);
+        const response = await apiRequest(`/api/pedidos/${pedidoId}`, "GET");
         return response;
       } catch (error) {
         console.error("Erro ao buscar detalhes do pedido:", error);
@@ -65,7 +65,7 @@ export function VisualizarPedidoDialog({
     queryKey: ['/api/pedidos/itens', pedidoId],
     queryFn: async () => {
       try {
-        const response = await apiRequest("GET", `/api/pedidos/${pedidoId}/itens`);
+        const response = await apiRequest(`/api/pedidos/${pedidoId}/itens`, "GET");
         return response;
       } catch (error) {
         console.error("Erro ao buscar itens do pedido:", error);
@@ -89,11 +89,11 @@ export function VisualizarPedidoDialog({
   const atualizarStatus = async (novoStatus: string) => {
     setIsSubmitting(true);
     try {
-      await apiRequest("PATCH", `/api/pedidos/${pedidoId}/status`, { status: novoStatus });
+      await apiRequest(`/api/pedidos/${pedidoId}/status`, "PATCH", { status: novoStatus });
       
       // Se o pedido for finalizado e for de uma mesa, liberar a mesa
       if (novoStatus === "finalizado" && pedido?.tipo === "mesa" && pedido?.mesaId) {
-        await apiRequest("PATCH", `/api/mesas/${pedido.mesaId}/status`, { status: "livre" });
+        await apiRequest(`/api/mesas/${pedido.mesaId}/status`, "PATCH", { status: "livre" });
       }
       
       // Atualizar os dados
