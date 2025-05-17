@@ -22,7 +22,9 @@ import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { formatCurrency, formatDateTime } from "@/lib/utils";
 import { NovoPedidoDialog } from "@/components/pedidos/novo-pedido-dialog";
-import { Eye, Plus, Search, FileDown, Printer } from "lucide-react";
+import { EditarPedidoDialog } from "@/components/pedidos/editar-pedido-dialog";
+import { ExcluirPedidoDialog } from "@/components/pedidos/excluir-pedido-dialog";
+import { Eye, Plus, Search, FileDown, Printer, Edit2, Trash2 } from "lucide-react";
 import { PrintButton } from "@/components/shared/print-button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { type Pedido } from "@shared/schema";
@@ -39,13 +41,13 @@ export default function Pedidos() {
   // Filtrar os pedidos com base nos filtros selecionados
   const pedidosFiltrados = pedidos?.filter(pedido => {
     // Filtro por status
-    if (filtroStatus !== "todos" && pedido.status.toLowerCase() !== filtroStatus.toLowerCase()) {
+    if (filtroStatus !== "todos" && pedido.status?.toLowerCase() !== filtroStatus.toLowerCase()) {
       return false;
     }
     
     // Filtro por texto (número do pedido ou nome do cliente)
     if (filtroTexto && !pedido.numero.toString().includes(filtroTexto) && 
-        !pedido.nomeCliente.toLowerCase().includes(filtroTexto.toLowerCase())) {
+        !(pedido.nomeCliente && pedido.nomeCliente.toLowerCase().includes(filtroTexto.toLowerCase()))) {
       return false;
     }
     
@@ -134,23 +136,44 @@ export default function Pedidos() {
                     pedidosFiltrados.map((pedido) => (
                       <TableRow key={pedido.id}>
                         <TableCell className="font-medium">#{pedido.numero}</TableCell>
-                        <TableCell>{formatDateTime(new Date(pedido.dataCriacao))}</TableCell>
-                        <TableCell>{pedido.nomeCliente}</TableCell>
-                        <TableCell>{formatCurrency(pedido.valorTotal)}</TableCell>
+                        <TableCell>{pedido.dataCriacao ? formatDateTime(new Date(pedido.dataCriacao)) : '-'}</TableCell>
+                        <TableCell>{pedido.nomeCliente || '-'}</TableCell>
+                        <TableCell>{formatCurrency(Number(pedido.valorTotal))}</TableCell>
                         <TableCell>
-                          <StatusBadge status={pedido.status} />
+                          <StatusBadge status={pedido.status || 'pendente'} />
                         </TableCell>
                         <TableCell>{pedido.tipo}</TableCell>
                         <TableCell className="text-right">
-                          <Button 
-                            variant="ghost" 
-                            size="icon"
-                            asChild
-                          >
-                            <Link href={`/pedidos/${pedido.id}`}>
-                              <Eye className="h-4 w-4" />
-                            </Link>
-                          </Button>
+                          <div className="flex justify-end space-x-1">
+                            <Button 
+                              variant="ghost" 
+                              size="icon"
+                              className="h-8 w-8"
+                              asChild
+                            >
+                              <Link href={`/pedidos/${pedido.id}`}>
+                                <Eye className="h-4 w-4" />
+                              </Link>
+                            </Button>
+                            
+                            <EditarPedidoDialog 
+                              pedido={pedido} 
+                              trigger={
+                                <Button variant="ghost" size="icon" className="h-8 w-8">
+                                  <Edit2 className="h-4 w-4" />
+                                </Button>
+                              }
+                            />
+                            
+                            <ExcluirPedidoDialog 
+                              pedido={pedido}
+                              trigger={
+                                <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive">
+                                  <Trash2 className="h-4 w-4" />
+                                </Button>
+                              }
+                            />
+                          </div>
                         </TableCell>
                       </TableRow>
                     ))
