@@ -11,8 +11,9 @@ import {
 import { Button } from "@/components/ui/button";
 import { StatusBadge } from "@/components/ui/status-badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Plus } from "lucide-react";
+import { Plus, ShoppingCart, Settings } from "lucide-react";
 import { NovaMesaDialog } from "@/components/mesas/nova-mesa-dialog";
+import { AdicionarProdutosMesaDialog } from "@/components/mesas/adicionar-produtos-mesa-dialog";
 import { 
   Dialog,
   DialogContent,
@@ -175,20 +176,38 @@ export default function Mesas() {
                     </p>
                   )}
                 </CardContent>
-                <CardFooter className="pt-0 flex justify-between">
+                <CardFooter className="pt-0 flex flex-wrap gap-2 justify-between">
                   <Button 
                     variant="outline"
+                    className="gap-1 flex-1"
                     onClick={() => {
                       setSelectedMesa(mesa);
                       setIsDialogOpen(true);
                     }}
                   >
+                    <Settings className="h-4 w-4" />
                     Gerenciar
                   </Button>
+                  
+                  {/* Botão para adicionar produtos à mesa */}
+                  <AdicionarProdutosMesaDialog 
+                    mesa={mesa}
+                    trigger={
+                      <Button 
+                        variant="default"
+                        className="gap-1 flex-1"
+                      >
+                        <ShoppingCart className="h-4 w-4" />
+                        Produtos
+                      </Button>
+                    }
+                  />
+                  
+                  {/* Botão para visualizar pedido da mesa, se estiver ocupada */}
                   {mesa.status.toLowerCase() === 'ocupada' && (
                     <Button 
                       variant="outline"
-                      className="border-primary text-primary hover:bg-primary/10"
+                      className="w-full mt-2 border-primary text-primary hover:bg-primary/10"
                       onClick={() => {
                         // Navegar para os pedidos da mesa
                         window.location.href = `/pedidos?mesa=${mesa.id}`;
