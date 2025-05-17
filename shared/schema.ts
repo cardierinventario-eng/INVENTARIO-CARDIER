@@ -206,6 +206,12 @@ export const configuracoes = pgTable("configuracoes", {
   logotipo: text("logotipo"),
   tema: text("tema").default("claro"),
   moeda: text("moeda").default("BRL"),
+  // Campos para controle de zeramentos de relatórios
+  dataZeramentoVendas: timestamp("data_zeramento_vendas"),
+  dataZeramentoFinanceiro: timestamp("data_zeramento_financeiro"),
+  // Campos para armazenar detalhes do último zeramento como JSON
+  relatorioVendasZerado: json("relatorio_vendas_zerado"),
+  relatorioFinanceiroZerado: json("relatorio_financeiro_zerado")
 });
 
 export const insertConfiguracaoSchema = createInsertSchema(configuracoes).pick({
