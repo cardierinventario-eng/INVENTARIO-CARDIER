@@ -45,7 +45,7 @@ interface ProdutosMesaDialogProps {
 }
 
 export function ProdutosMesaDialog({ mesa, trigger }: ProdutosMesaDialogProps) {
-  const [isOpen, setIsOpen] = useState(false);
+  const [open, setOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [itemSelecionadoId, setItemSelecionadoId] = useState<number | undefined>(undefined);
   const [quantidade, setQuantidade] = useState(1);
@@ -184,7 +184,7 @@ export function ProdutosMesaDialog({ mesa, trigger }: ProdutosMesaDialogProps) {
       });
       
       // Fechar o diálogo e resetar formulário
-      setIsOpen(false);
+      setOpen(false);
       setItensSelecionados([]);
       setItemSelecionadoId(undefined);
       setQuantidade(1);
@@ -202,30 +202,24 @@ export function ProdutosMesaDialog({ mesa, trigger }: ProdutosMesaDialogProps) {
     }
   };
   
-  // Resetar o formulário quando o diálogo é fechado
-  const handleOpenChange = (open: boolean) => {
-    if (!open) {
-      setItensSelecionados([]);
-      setItemSelecionadoId(undefined);
-      setQuantidade(1);
-      setObservacoes("");
-    }
-    setIsOpen(open);
+  // Função para fechar o diálogo
+  const fecharDialog = () => {
+    setOpen(false);
+    setItensSelecionados([]);
+    setItemSelecionadoId(undefined);
+    setQuantidade(1);
+    setObservacoes("");
   };
   
   return (
-    <Dialog open={isOpen} onOpenChange={handleOpenChange}>
-      {trigger ? (
-        <DialogTrigger asChild>
-          {trigger}
-        </DialogTrigger>
-      ) : (
-        <DialogTrigger asChild>
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger asChild onClick={() => setOpen(true)}>
+        {trigger || (
           <Button variant="default">
             <ShoppingCart className="mr-2 h-4 w-4" /> Produtos
           </Button>
-        </DialogTrigger>
-      )}
+        )}
+      </DialogTrigger>
       
       <DialogContent className="sm:max-w-[600px]">
         <DialogHeader>
@@ -346,21 +340,20 @@ export function ProdutosMesaDialog({ mesa, trigger }: ProdutosMesaDialogProps) {
         <DialogFooter>
           <Button 
             variant="outline" 
-            onClick={() => {
-              setIsOpen(false);
-              handleOpenChange(false);
-            }}
+            onClick={fecharDialog}
+            type="button"
           >
             Cancelar
           </Button>
           <Button 
             onClick={criarPedido} 
             disabled={isSubmitting || itensSelecionados.length === 0}
+            type="button"
           >
             {isSubmitting ? (
               "Criando pedido..."
             ) : (
-              <>Criar Pedido</>
+              "Criar Pedido"
             )}
           </Button>
         </DialogFooter>
