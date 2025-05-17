@@ -147,6 +147,26 @@ export function NovoPedidoDialog({
     onOpenChange?.(isOpen);
   }, [isOpen, onOpenChange]);
   
+  // Efeito separado para manejar o redirecionamento quando o diálogo fecha
+  useEffect(() => {
+    // Só executa quando o diálogo estiver fechado
+    if (isOpen === false) {
+      const urlParams = new URLSearchParams(window.location.search);
+      const mesaIdParam = urlParams.get('mesa');
+      const acaoParam = urlParams.get('acao');
+      
+      // Se estamos na página de pedidos com parâmetros de mesa e a ação é "adicionar",
+      // voltar para a página de mesas quando o diálogo for fechado
+      if (mesaIdParam && acaoParam === 'adicionar') {
+        const timer = setTimeout(() => {
+          window.location.href = '/mesas';
+        }, 500);
+        
+        return () => clearTimeout(timer);
+      }
+    }
+  }, [isOpen]);
+  
   // Pré-selecionar mesa e tipo quando mesaIdPreSelecionada é fornecido
   useEffect(() => {
     if (mesaIdPreSelecionada && form) {
