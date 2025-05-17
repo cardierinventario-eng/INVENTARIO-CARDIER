@@ -347,10 +347,15 @@ export function NovoPedidoDialog({ open = false, onOpenChange }: NovoPedidoDialo
       </head>
       <body>
         <div class="container">
-          <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
-            <div style="font-size: 12px;">${dataFormatada.split(' ')[0]}</div>
-            <div style="font-size: 12px;">Pedido</div>
+          <div style="display: flex; justify-content: space-between; margin-bottom: 30px;">
+            <div style="font-size: 14px;">${dataFormatada.split(' ')[0]}</div>
+            <div style="font-size: 14px;">Pedido</div>
           </div>
+          
+          <div style="text-align: right; margin-bottom: 10px;">
+            <div style="font-size: 14px; margin-right: 5px;">Pedido</div>
+          </div>
+          
           <div class="header">
             <div class="titulo">LANCHE FÁCIL</div>
             <div class="subtitulo">COMPROVANTE DE PEDIDO</div>
