@@ -25,6 +25,8 @@ import {
 import { Skeleton } from "@/components/ui/skeleton";
 import { type ItemEstoque as ItemEstoqueType } from "@shared/schema";
 
+import { NovoItemEstoqueDialog } from "@/components/estoque/novo-item-estoque-dialog";
+
 export default function Estoque() {
   const [filtro, setFiltro] = useState("");
   const [categoriaAtiva, setCategoriaAtiva] = useState("todos");
@@ -49,7 +51,7 @@ export default function Estoque() {
   });
 
   // Agrupar por categoria para exibir na interface
-  const categorias = [...new Set(itensEstoque?.map(item => item.categoria))];
+  const categorias = [...new Set(itensEstoque?.map(item => item.categoria) || [])];
 
   return (
     <>
@@ -58,9 +60,7 @@ export default function Estoque() {
           <h1 className="text-2xl font-heading font-bold text-neutral-darkest">Controle de Estoque</h1>
           <p className="text-neutral-dark">Gerencie o estoque de produtos do seu restaurante</p>
         </div>
-        <Button className="bg-primary hover:bg-primary-dark text-white">
-          <Plus className="mr-2 h-4 w-4" /> Novo Item
-        </Button>
+        <NovoItemEstoqueDialog />
       </div>
       
       <Tabs defaultValue="todos" className="mb-6">
@@ -118,54 +118,72 @@ export default function Estoque() {
         </div>
         
         <TabsContent value="todos" className="mt-0">
-          <div className="bg-white rounded-lg shadow">
-            <div id="tabela-estoque" className="p-5">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Produto</TableHead>
-                    <TableHead>Categoria</TableHead>
-                    <TableHead>Quantidade</TableHead>
-                    <TableHead>Unidade</TableHead>
-                    <TableHead>Estoque Mínimo</TableHead>
-                    <TableHead>Estoque Ideal</TableHead>
-                    <TableHead>Status</TableHead>
-                    <TableHead className="text-right">Ações</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {isLoading ? (
-                    // Skeleton loader para dados em carregamento
-                    Array(5).fill(0).map((_, index) => (
-                      <TableRow key={index}>
-                        <TableCell><Skeleton className="h-4 w-32" /></TableCell>
-                        <TableCell><Skeleton className="h-4 w-24" /></TableCell>
-                        <TableCell><Skeleton className="h-4 w-16" /></TableCell>
-                        <TableCell><Skeleton className="h-4 w-16" /></TableCell>
-                        <TableCell><Skeleton className="h-4 w-16" /></TableCell>
-                        <TableCell><Skeleton className="h-4 w-16" /></TableCell>
-                        <TableCell><Skeleton className="h-6 w-24 rounded-full" /></TableCell>
-                        <TableCell className="text-right">
-                          <div className="flex justify-end space-x-1">
-                            <Skeleton className="h-9 w-9 rounded-md" />
-                            <Skeleton className="h-9 w-9 rounded-md" />
-                          </div>
-                        </TableCell>
-                      </TableRow>
-                    ))
-                  ) : itensFiltrados && itensFiltrados.length > 0 ? (
-                    itensFiltrados.map((item) => (
-                      <ItemEstoque key={item.id} item={item} />
-                    ))
-                  ) : (
-                    <TableRow>
-                      <TableCell colSpan={8} className="text-center py-6 text-neutral-dark">
-                        Nenhum item encontrado
-                      </TableCell>
-                    </TableRow>
-                  )}
-                </TableBody>
-              </Table>
+          <div id="tabela-estoque">
+            {isLoading ? (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                {Array(8).fill(0).map((_, index) => (
+                  <Skeleton key={index} className="h-[200px] rounded-lg" />
+                ))}
+              </div>
+            ) : itensFiltrados && itensFiltrados.length > 0 ? (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                {itensFiltrados.map((item) => (
+                  <ItemEstoque key={item.id} item={item} />
+                ))}
+              </div>
+            ) : (
+              <div className="p-16 text-center bg-white rounded-lg shadow">
+                <div className="mx-auto w-24 h-24 bg-muted rounded-full flex items-center justify-center mb-6">
+                  <Package className="h-12 w-12 text-muted-foreground" />
+                </div>
+                <h3 className="text-lg font-semibold mb-2">Nenhum item encontrado</h3>
+                <p className="text-muted-foreground mb-6">
+                  {filtro ? 
+                    `Não encontramos itens correspondentes à sua busca "${filtro}"` : 
+                    "Ainda não existem itens cadastrados no estoque."}
+                </p>
+                <NovoItemEstoqueDialog />
+              </div>
+            )}
+            
+            {/* Versão para impressão (oculta na tela) */}
+            <div className="hidden print:block mt-8">
+              <h2 className="text-xl font-bold mb-4">Relatório de Estoque</h2>
+              <p className="mb-4">Data: {new Date().toLocaleDateString('pt-BR')}</p>
+              
+              {categorias.length > 0 && (
+                <div className="space-y-6">
+                  {categorias.map((categoria) => (
+                    <div key={categoria} className="mb-6">
+                      <h3 className="text-lg font-semibold border-b pb-2 mb-2">{categoria}</h3>
+                      <table className="w-full border-collapse">
+                        <thead>
+                          <tr className="bg-gray-100">
+                            <th className="py-2 px-3 border text-left">Item</th>
+                            <th className="py-2 px-3 border text-left">Quantidade</th>
+                            <th className="py-2 px-3 border text-left">Mínimo</th>
+                            <th className="py-2 px-3 border text-left">Ideal</th>
+                            <th className="py-2 px-3 border text-left">Preço Unit.</th>
+                            <th className="py-2 px-3 border text-left">Valor Total</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {itensEstoque?.filter(item => item.categoria === categoria).map(item => (
+                            <tr key={item.id} className="border-b">
+                              <td className="py-2 px-3 border">{item.nome}</td>
+                              <td className="py-2 px-3 border">{item.quantidade} {item.unidade}</td>
+                              <td className="py-2 px-3 border">{item.estoqueMinimo} {item.unidade}</td>
+                              <td className="py-2 px-3 border">{item.estoqueIdeal} {item.unidade}</td>
+                              <td className="py-2 px-3 border">R$ {parseFloat(item.precoUnitario).toFixed(2)}</td>
+                              <td className="py-2 px-3 border">R$ {(item.quantidade * parseFloat(item.precoUnitario)).toFixed(2)}</td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
           </div>
         </TabsContent>
