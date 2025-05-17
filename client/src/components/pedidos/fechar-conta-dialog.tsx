@@ -65,7 +65,7 @@ export function FecharContaDialog({
   
   // Buscar itens do pedido
   const { data: itensPedido = [], isLoading: itensLoading } = useQuery({
-    queryKey: ['/api/pedidos/itens', pedidoId],
+    queryKey: [`/api/pedidos/${pedidoId}/itens`],
     enabled: isOpen,
   });
   

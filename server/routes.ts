@@ -425,6 +425,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
   
   // Nova rota para criar itens de pedido diretamente
+  // Obter itens de um pedido específico
+  app.get("/api/pedidos/:id/itens", async (req, res) => {
+    try {
+      const pedidoId = parseInt(req.params.id);
+      
+      // Verificar se o pedido existe
+      const pedido = await storage.getPedido(pedidoId);
+      if (!pedido) {
+        return res.status(404).json({ message: "Pedido não encontrado" });
+      }
+      
+      const itens = await storage.getItensPedido(pedidoId);
+      res.json(itens);
+    } catch (error) {
+      res.status(400).json({ message: "Erro ao buscar itens do pedido", error });
+    }
+  });
+
   app.post("/api/pedidos/itens", async (req, res) => {
     try {
       const data = insertItemPedidoSchema.parse(req.body);
