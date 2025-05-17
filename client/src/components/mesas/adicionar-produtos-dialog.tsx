@@ -144,7 +144,10 @@ export function AdicionarProdutosDialog({ mesa, aberto, aoFechar }: AdicionarPro
           observacoes: "",
           status: "em preparo",
           numero: Math.floor(Math.random() * 9000) + 1000, // número aleatório de 4 dígitos
-          valorTotal: 0 // Valor inicial zero
+          valorTotal: 0, // Valor inicial zero
+          valorDesconto: 0, // Valor inicial zero
+          taxaServico: 0, // Valor inicial zero
+          formaPagamento: "dinheiro" // Valor padrão
         };
         
         const pedidoResponse = await apiRequest("POST", "/api/pedidos", novoPedido);
