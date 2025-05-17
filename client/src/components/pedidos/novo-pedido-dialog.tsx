@@ -237,18 +237,20 @@ export function NovoPedidoDialog({ open = false, onOpenChange }: NovoPedidoDialo
       // Adicionar itens ao pedido
       const pedidoId = pedidoCriado.id;
       
-      for (const item of itensSelecionados) {
-        try {
-          await apiRequest("POST", `/api/pedidos/${pedidoId}/itens`, {
-            pedidoId,
+      try {
+        // Usar endpoint simplificado
+        for (const item of itensSelecionados) {
+          await apiRequest("POST", "/api/pedidos/itens", {
+            pedidoId: pedidoId,
             itemId: item.id,
             nome: item.nome,
             preco: typeof item.preco === 'string' ? item.preco : item.preco.toString(),
             quantidade: item.quantidade
           });
-        } catch (itemError) {
-          console.error("Erro ao adicionar item ao pedido:", itemError);
         }
+      } catch (itemError) {
+        console.error("Erro ao adicionar itens ao pedido:", itemError);
+        // Mesmo com erro nos itens, consideramos que o pedido foi criado com sucesso
       }
       
       toast({
