@@ -2,108 +2,91 @@ import { useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
+import { type ItemEstoque } from "@shared/schema";
 
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
-import { AlertTriangle } from "lucide-react";
+import { Trash2 } from "lucide-react";
 
 interface ExcluirItemEstoqueDialogProps {
-  itemId: number;
-  itemNome: string;
+  item: ItemEstoque;
   children?: React.ReactNode;
 }
 
-export function ExcluirItemEstoqueDialog({ 
-  itemId, 
-  itemNome,
-  children 
-}: ExcluirItemEstoqueDialogProps) {
+export function ExcluirItemEstoqueDialog({ item, children }: ExcluirItemEstoqueDialogProps) {
   const [isOpen, setIsOpen] = useState(false);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const queryClient = useQueryClient();
+  const [isDeleting, setIsDeleting] = useState(false);
   const { toast } = useToast();
+  const queryClient = useQueryClient();
 
   const handleExcluir = async () => {
-    setIsSubmitting(true);
+    setIsDeleting(true);
+    
     try {
-      await apiRequest(`/api/estoque/${itemId}`, "DELETE");
+      await apiRequest(`/api/estoque/${item.id}`, "DELETE");
       
-      toast({
-        title: "Item excluído",
-        description: `O item "${itemNome}" foi removido do estoque com sucesso`,
-        variant: "success",
-      });
-      
-      // Invalidar cache para atualizar listagens
       queryClient.invalidateQueries({ queryKey: ['/api/estoque'] });
       queryClient.invalidateQueries({ queryKey: ['/api/estoque/baixo'] });
       queryClient.invalidateQueries({ queryKey: ['/api/dashboard/stats'] });
       
-      // Fechar dialog
+      toast({
+        title: "Item excluído",
+        description: "O item foi excluído com sucesso!",
+      });
+      
       setIsOpen(false);
     } catch (error) {
       console.error("Erro ao excluir item:", error);
       toast({
         title: "Erro",
-        description: "Não foi possível excluir o item do estoque",
+        description: "Ocorreu um erro ao excluir o item",
         variant: "destructive",
       });
     } finally {
-      setIsSubmitting(false);
+      setIsDeleting(false);
     }
   };
 
   return (
-    <Dialog open={isOpen} onOpenChange={setIsOpen}>
-      <DialogTrigger asChild>
-        {children}
-      </DialogTrigger>
-      <DialogContent className="sm:max-w-[425px]">
-        <DialogHeader>
-          <DialogTitle className="flex items-center gap-2">
-            <AlertTriangle className="h-5 w-5 text-destructive" />
-            Confirmar Exclusão
-          </DialogTitle>
-          <DialogDescription>
-            Tem certeza que deseja excluir o item "{itemNome}"?
-            Esta ação não pode ser desfeita.
-          </DialogDescription>
-        </DialogHeader>
-
-        <div className="mt-2 p-4 bg-destructive/10 rounded-md text-sm">
-          <p>A exclusão deste item também removerá:</p>
-          <ul className="list-disc pl-5 mt-2 space-y-1">
-            <li>Todo o histórico de movimentações do item</li>
-            <li>Registros de estoque relacionados</li>
-          </ul>
-        </div>
-
-        <DialogFooter>
-          <Button 
-            type="button" 
-            variant="outline"
-            onClick={() => setIsOpen(false)}
-          >
-            Cancelar
+    <AlertDialog open={isOpen} onOpenChange={setIsOpen}>
+      <AlertDialogTrigger asChild>
+        {children || (
+          <Button variant="ghost" size="icon" className="text-destructive">
+            <Trash2 className="h-4 w-4" />
           </Button>
-          <Button 
-            type="button"
-            variant="destructive"
-            disabled={isSubmitting}
-            onClick={handleExcluir}
+        )}
+      </AlertDialogTrigger>
+      <AlertDialogContent>
+        <AlertDialogHeader>
+          <AlertDialogTitle>Excluir Item</AlertDialogTitle>
+          <AlertDialogDescription>
+            Tem certeza que deseja excluir o item <strong>{item.nome}</strong>? Esta ação não pode ser desfeita.
+          </AlertDialogDescription>
+        </AlertDialogHeader>
+        <AlertDialogFooter>
+          <AlertDialogCancel disabled={isDeleting}>Cancelar</AlertDialogCancel>
+          <AlertDialogAction
+            onClick={(e) => {
+              e.preventDefault();
+              handleExcluir();
+            }}
+            disabled={isDeleting}
+            className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
           >
-            {isSubmitting ? "Excluindo..." : "Excluir Item"}
-          </Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
+            {isDeleting ? "Excluindo..." : "Confirmar Exclusão"}
+          </AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
   );
 }

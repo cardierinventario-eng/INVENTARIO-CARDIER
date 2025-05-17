@@ -4,6 +4,8 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { AlertCircle, Edit, Trash2, MoreHorizontal, ArrowUpDown } from "lucide-react";
 import { AjustarEstoqueDialog } from "./ajustar-estoque-dialog";
+import { EditarItemEstoqueDialog } from "./editar-item-estoque-dialog";
+import { ExcluirItemEstoqueDialog } from "./excluir-item-estoque-dialog";
 
 interface ItemEstoqueProps {
   item: any;
@@ -77,12 +79,18 @@ export function ItemEstoque({ item }: ItemEstoqueProps) {
         )}
       </CardContent>
       <CardFooter className="flex justify-between p-2 bg-muted/10 border-t">        
-        <AjustarEstoqueDialog item={item}>
-          <Button variant="outline" size="sm" className="h-8">
-            <ArrowUpDown className="h-4 w-4 mr-1" />
-            Ajustar Estoque
-          </Button>
-        </AjustarEstoqueDialog>
+        <div className="flex items-center space-x-2">
+          <AjustarEstoqueDialog item={item}>
+            <Button variant="outline" size="sm" className="h-8">
+              <ArrowUpDown className="h-4 w-4 mr-1" />
+              Ajustar Estoque
+            </Button>
+          </AjustarEstoqueDialog>
+        </div>
+        <div className="flex items-center space-x-1">
+          <EditarItemEstoqueDialog item={item} />
+          <ExcluirItemEstoqueDialog item={item} />
+        </div>
       </CardFooter>
     </Card>
   );
