@@ -74,8 +74,13 @@ const itemSchema = z.object({
 type FormValues = z.infer<typeof formSchema>;
 type ItemPedido = z.infer<typeof itemSchema>;
 
-export function NovoPedidoDialog() {
-  const [open, setOpen] = useState(false);
+interface NovoPedidoDialogProps {
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
+}
+
+export function NovoPedidoDialog({ open = false, onOpenChange }: NovoPedidoDialogProps) {
+  const [isOpen, setIsOpen] = useState(open);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [itensSelecionados, setItensSelecionados] = useState<ItemPedido[]>([]);
   const queryClient = useQueryClient();
@@ -117,13 +122,25 @@ export function NovoPedidoDialog() {
     },
   });
 
+  // Sincronizar estado local e propriedade externa
+  useEffect(() => {
+    if (isOpen !== open) {
+      setIsOpen(open);
+    }
+  }, [open]);
+  
+  // Quando o estado local muda, notificar o pai
+  useEffect(() => {
+    onOpenChange?.(isOpen);
+  }, [isOpen, onOpenChange]);
+
   // Resetar formulário quando modal é fechado
   useEffect(() => {
-    if (!open) {
+    if (!isOpen) {
       form.reset();
       setItensSelecionados([]);
     }
-  }, [open, form]);
+  }, [isOpen, form]);
 
   // Adicionar item ao pedido
   const adicionarItem = (item: any) => {
@@ -206,34 +223,45 @@ export function NovoPedidoDialog() {
 
       console.log("Enviando pedido:", novoPedido);
       
-      const pedidoCriado = await apiRequest("POST", "/api/pedidos", novoPedido);
-      
-      // Adicionar itens ao pedido
-      const pedidoId = pedidoCriado.id;
-      const promisesItens = itensSelecionados.map(item => 
-        apiRequest("POST", `/api/pedidos/${pedidoId}/itens`, {
-          pedidoId,
-          itemId: item.id,
-          nome: item.nome,
-          preco: typeof item.preco === 'string' ? item.preco : item.preco.toString(),
-          quantidade: item.quantidade
-        })
-      );
-      
-      await Promise.all(promisesItens);
-      
-      toast({
-        title: "Pedido criado",
-        description: "O pedido foi registrado com sucesso",
-        variant: "success",
-      });
-      
-      // Invalidar cache para atualizar listagens
-      queryClient.invalidateQueries({ queryKey: ['/api/pedidos'] });
-      queryClient.invalidateQueries({ queryKey: ['/api/pedidos/recentes'] });
+      try {
+        const pedidoCriado: any = await apiRequest("POST", "/api/pedidos", novoPedido);
+        
+        // Adicionar itens ao pedido
+        if (pedidoCriado && typeof pedidoCriado === 'object' && pedidoCriado.id) {
+          const pedidoId = pedidoCriado.id;
+          
+          // Adicionar itens ao pedido
+          const promisesItens = itensSelecionados.map(item => 
+            apiRequest("POST", `/api/pedidos/${pedidoId}/itens`, {
+              pedidoId,
+              itemId: item.id,
+              nome: item.nome,
+              preco: typeof item.preco === 'string' ? item.preco : item.preco.toString(),
+              quantidade: item.quantidade
+            })
+          );
+          
+          await Promise.all(promisesItens);
+          
+          toast({
+            title: "Pedido criado",
+            description: "O pedido foi registrado com sucesso",
+            variant: "success",
+          });
+          
+          // Invalidar cache para atualizar listagens
+          queryClient.invalidateQueries({ queryKey: ['/api/pedidos'] });
+          queryClient.invalidateQueries({ queryKey: ['/api/pedidos/recentes'] });
+        } else {
+          throw new Error("Falha ao criar pedido: resposta inválida do servidor");
+        }
+      } catch (error) {
+        console.error("Erro ao processar pedido:", error);
+        throw error; // Re-throw para ser capturado pelo try/catch externo
+      }
       
       // Fechar modal e resetar form
-      setOpen(false);
+      setIsOpen(false);
     } catch (error) {
       console.error("Erro ao criar pedido:", error);
       toast({
@@ -247,7 +275,7 @@ export function NovoPedidoDialog() {
   };
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
+    <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
         <Button className="bg-primary hover:bg-primary-dark text-white">
           <Plus className="mr-2 h-4 w-4" /> Novo Pedido
@@ -478,7 +506,7 @@ export function NovoPedidoDialog() {
               <Button 
                 type="button" 
                 variant="outline" 
-                onClick={() => setOpen(false)}
+                onClick={() => setIsOpen(false)}
                 disabled={isSubmitting}
               >
                 Cancelar
