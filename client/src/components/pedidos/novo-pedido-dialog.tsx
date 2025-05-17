@@ -57,7 +57,7 @@ import {
 // Schema de validação
 const formSchema = z.object({
   tipo: z.string().min(1, "Tipo de pedido é obrigatório"),
-  mesaId: z.number().optional(),
+  mesaId: z.number().nullable().optional(),
   clienteId: z.number().optional(),
   nomeCliente: z.string().optional(),
   formaPagamento: z.string().optional(),
@@ -117,7 +117,7 @@ export function NovoPedidoDialog({ open = false, onOpenChange }: NovoPedidoDialo
     resolver: zodResolver(formSchema),
     defaultValues: {
       tipo: "balcao",
-      mesaId: undefined,
+      mesaId: null,
       clienteId: undefined,
       nomeCliente: "",
       formaPagamento: "dinheiro",
