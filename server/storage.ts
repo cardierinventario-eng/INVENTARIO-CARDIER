@@ -91,6 +91,7 @@ export interface IStorage {
   getRelatorioVendas(): Promise<RelatorioVendas>;
   getRelatorioFinanceiro(): Promise<RelatorioFinanceiro>;
   getRelatorioEstoque(): Promise<RelatorioEstoque>;
+  zerarRelatorioVendas(): Promise<boolean>;
 }
 
 export class MemStorage implements IStorage {

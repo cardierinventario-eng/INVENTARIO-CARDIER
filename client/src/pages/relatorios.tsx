@@ -34,7 +34,7 @@ export default function Relatorios() {
     isLoading: isLoadingVendas 
   } = useQuery({
     queryKey: ["/api/relatorios/vendas"],
-    queryFn: () => apiRequest<RelatorioVendas>("/api/relatorios/vendas"),
+    queryFn: () => apiRequest("/api/relatorios/vendas"),
     enabled: tabValue === "vendas",
   });
 
@@ -44,7 +44,7 @@ export default function Relatorios() {
     isLoading: isLoadingFinanceiro 
   } = useQuery({
     queryKey: ["/api/relatorios/financeiro"],
-    queryFn: () => apiRequest<RelatorioFinanceiro>("/api/relatorios/financeiro"),
+    queryFn: () => apiRequest("/api/relatorios/financeiro"),
     enabled: tabValue === "financeiro",
   });
 
@@ -54,7 +54,7 @@ export default function Relatorios() {
     isLoading: isLoadingEstoque 
   } = useQuery({
     queryKey: ["/api/relatorios/estoque"],
-    queryFn: () => apiRequest<RelatorioEstoque>("/api/relatorios/estoque"),
+    queryFn: () => apiRequest("/api/relatorios/estoque"),
     enabled: tabValue === "estoque",
   });
 
