@@ -627,41 +627,19 @@ export class MemStorage implements IStorage {
   async getRelatorioVendas(): Promise<RelatorioVendas> {
     // Verificar se o relatório foi zerado
     if (this.relatorioVendasZerado) {
-      const dataZeramento = this.relatorioVendasZerado.data;
+      console.log("Relatório foi zerado anteriormente, verificando tempo decorrido");
       
-      // Verificar se o zeramento foi feito recentemente
-      // Em um sistema real, verificaríamos se os dados de vendas são posteriores ao zeramento
-      const agora = new Date();
-      const tempoDecorrido = agora.getTime() - dataZeramento.getTime();
-      const horasDecorridas = tempoDecorrido / (1000 * 60 * 60);
-      
-      // Se o relatório foi zerado nas últimas 24 horas, retornar dados zerados
-      if (horasDecorridas < 24) {
-        // Gerar dados de vendas por dia zerados (últimos 7 dias)
-        const vendasPorDia = [];
-        for (let i = 6; i >= 0; i--) {
-          const data = new Date();
-          data.setDate(data.getDate() - i);
-          
-          // Formatar a data como DD/MM
-          const dataFormatada = `${data.getDate().toString().padStart(2, '0')}/${(data.getMonth() + 1).toString().padStart(2, '0')}`;
-          
-          vendasPorDia.push({
-            data: dataFormatada,
-            total: 0,
-            quantidade: 0
-          });
-        }
-        
-        return {
-          vendasPorDia,
-          vendasPorCategoria: this.relatorioVendasZerado.vendasPorCategoria,
-          produtosMaisVendidos: []
-        };
-      }
+      // Se o relatório foi zerado, retornar os dados zerados
+      return {
+        vendasPorDia: this.relatorioVendasZerado.vendasPorDia,
+        vendasPorCategoria: this.relatorioVendasZerado.vendasPorCategoria,
+        produtosMaisVendidos: this.relatorioVendasZerado.produtosMaisVendidos
+      };
     }
     
-    // Se não foi zerado recentemente, retornar dados normais simulados
+    console.log("Retornando dados normais do relatório");
+    
+    // Se não foi zerado, retornar dados normais simulados
     // Dados simulados para o relatório de vendas
     // Vendas por dia (últimos 7 dias)
     const vendasPorDia = [];
@@ -808,10 +786,26 @@ export class MemStorage implements IStorage {
       // ou marcar registros históricos de vendas. Como estamos usando uma implementação
       // em memória, vamos criar um "marco zero" de dados.
       
+      // Gerar dados de vendas por dia zerados (últimos 7 dias)
+      const vendasPorDia = [];
+      for (let i = 6; i >= 0; i--) {
+        const data = new Date();
+        data.setDate(data.getDate() - i);
+        
+        // Formatar a data como DD/MM
+        const dataFormatada = `${data.getDate().toString().padStart(2, '0')}/${(data.getMonth() + 1).toString().padStart(2, '0')}`;
+        
+        vendasPorDia.push({
+          data: dataFormatada,
+          total: 0,
+          quantidade: 0
+        });
+      }
+      
       // Definir um "marco zero" para o relatório
       this.relatorioVendasZerado = {
         data: new Date(), // Marca quando o relatório foi zerado
-        vendasPorDia: [],
+        vendasPorDia: vendasPorDia,
         vendasPorCategoria: [
           { categoria: "Lanches", total: 0, quantidade: 0 },
           { categoria: "Porções", total: 0, quantidade: 0 },
@@ -821,13 +815,6 @@ export class MemStorage implements IStorage {
         ],
         produtosMaisVendidos: []
       };
-      
-      // Limpar contadores internos (se existirem)
-      // Em uma implementação real com DB, isso seria feito na consulta
-      // Aqui estamos simulando essa limpeza de contadores
-      
-      // Reiniciar os dados de venda nos pedidos existentes (apenas para demonstração)
-      // Na vida real isso seria feito usando uma flag ou campo de data de referência no banco
       
       console.log("Relatório de vendas zerado com sucesso");
       return true;
