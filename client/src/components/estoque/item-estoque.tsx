@@ -16,7 +16,7 @@ export function ItemEstoque({ item }: ItemEstoqueProps) {
     item.quantidade >= item.estoqueIdeal ? "ideal" : "normal";
   
   // Calcular valor total
-  const valorTotal = item.quantidade * parseFloat(item.precoUnitario);
+  const valorTotal = parseFloat(item.quantidade) * parseFloat(item.valorUnitario || '0');
   
   return (
     <Card className="overflow-hidden">
