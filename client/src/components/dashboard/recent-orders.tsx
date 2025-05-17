@@ -295,7 +295,7 @@ export function RecentOrders() {
                     <StatusBadge status={selectedPedido.status} />
                   </div>
                   <div className="text-xs text-neutral-medium mt-1">
-                    Data: {formatDateTime(new Date(selectedPedido.dataCriacao))}
+                    Data: {formatDateTime(new Date(selectedPedido.dataCriacao || Date.now()))}
                   </div>
                   {selectedPedido.tipo === 'mesa' && (
                     <div className="text-xs text-neutral-medium">
@@ -308,25 +308,31 @@ export function RecentOrders() {
               <div className="py-2">
                 <div className="text-sm font-medium mb-2">Itens do Pedido</div>
                 <div className="space-y-2 max-h-48 overflow-y-auto pr-1">
-                  {itensPedido.map((item) => (
-                    <div key={item.id} className="flex justify-between p-2 bg-neutral-lightest rounded">
-                      <div>
-                        <div className="font-medium">{item.nome}</div>
-                        <div className="text-xs text-neutral-medium">
-                          {item.quantidade}x {formatCurrency(item.preco / item.quantidade)}
+                  {itensPedido.map((item) => {
+                    const quantidade = Number(item.quantidade);
+                    const preco = Number(item.preco);
+                    const precoUnitario = quantidade > 0 ? preco / quantidade : 0;
+                    
+                    return (
+                      <div key={item.id} className="flex justify-between p-2 bg-neutral-lightest rounded">
+                        <div>
+                          <div className="font-medium">{item.nome}</div>
+                          <div className="text-xs text-neutral-medium">
+                            {quantidade}x {formatCurrency(precoUnitario)}
+                          </div>
+                          {item.observacoes && (
+                            <div className="text-xs italic mt-1">{item.observacoes}</div>
+                          )}
                         </div>
-                        {item.observacoes && (
-                          <div className="text-xs italic mt-1">{item.observacoes}</div>
-                        )}
+                        <div className="font-medium text-right">{formatCurrency(preco)}</div>
                       </div>
-                      <div className="font-medium text-right">{formatCurrency(item.preco)}</div>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
                 
                 <div className="border-t mt-3 pt-2 flex justify-between items-center">
                   <span className="font-medium">Total</span>
-                  <span className="font-bold text-lg">{formatCurrency(selectedPedido.valorTotal)}</span>
+                  <span className="font-bold text-lg">{formatCurrency(Number(selectedPedido.valorTotal))}</span>
                 </div>
                 
                 {selectedPedido.observacoes && (
