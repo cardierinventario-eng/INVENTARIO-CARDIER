@@ -224,11 +224,11 @@ export function NovoPedidoDialog({ open = false, onOpenChange }: NovoPedidoDialo
 
       console.log("Enviando pedido:", novoPedido);
       
-      // Usando type assertion para tratar corretamente a resposta
+      // Enviando pedido para o servidor
       const response = await apiRequest("POST", "/api/pedidos", novoPedido);
       
-      // Converter para tipo desconhecido primeiro e depois para o tipo específico
-      const pedidoCriado = response as unknown as { id: number };
+      // Obter os dados JSON da resposta
+      const pedidoCriado = await response.json();
       
       if (!pedidoCriado || !pedidoCriado.id) {
         throw new Error("Erro ao criar pedido: resposta inválida");
