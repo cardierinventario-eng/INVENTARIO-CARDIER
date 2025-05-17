@@ -698,6 +698,17 @@ export class MemStorage implements IStorage {
   }
 
   async getRelatorioFinanceiro(): Promise<RelatorioFinanceiro> {
+    // Verifica se o relatório financeiro foi zerado
+    if (this.relatorioFinanceiroZerado) {
+      console.log("Retornando dados do marco zero financeiro");
+      return {
+        receitasPorDia: this.relatorioFinanceiroZerado.receitasPorDia,
+        despesasPorCategoria: this.relatorioFinanceiroZerado.despesasPorCategoria,
+        resumoMensal: this.relatorioFinanceiroZerado.resumoMensal
+      };
+    }
+    
+    console.log("Retornando dados normais do relatório financeiro");
     // Dados simulados para o relatório financeiro
     // Receitas por dia (últimos 30 dias)
     const receitasPorDia = [];

@@ -486,16 +486,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
     res.json(relatorio);
   });
   
-  // Endpoint para zerar relatório de vendas
-  app.post("/api/relatorios/vendas/zerar", async (req, res) => {
+  // Endpoint para zerar relatórios
+  app.post("/api/relatorios/zerar", async (req, res) => {
     try {
-      // Implementar a lógica para zerar as contagens e dados do relatório
-      // Esta funcionalidade deve ser adicionada na interface IStorage e implementada nas classes
+      // Zera tanto o relatório de vendas quanto o financeiro
       const result = await storage.zerarRelatorioVendas();
-      res.json({ success: true, message: "Relatório de vendas zerado com sucesso" });
+      res.json({ success: true, message: "Relatórios zerados com sucesso" });
     } catch (error) {
-      console.error("Erro ao zerar relatório de vendas:", error);
-      res.status(500).json({ success: false, message: "Erro ao zerar relatório de vendas" });
+      console.error("Erro ao zerar relatórios:", error);
+      res.status(500).json({ success: false, message: "Erro ao zerar relatórios" });
     }
   });
 
