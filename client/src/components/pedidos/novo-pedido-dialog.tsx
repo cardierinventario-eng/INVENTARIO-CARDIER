@@ -347,6 +347,10 @@ export function NovoPedidoDialog({ open = false, onOpenChange }: NovoPedidoDialo
       </head>
       <body>
         <div class="container">
+          <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+            <div style="font-size: 12px;">${dataFormatada.split(' ')[0]}</div>
+            <div style="font-size: 12px;">Pedido</div>
+          </div>
           <div class="header">
             <div class="titulo">LANCHE FÁCIL</div>
             <div class="subtitulo">COMPROVANTE DE PEDIDO</div>
