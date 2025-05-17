@@ -43,7 +43,7 @@ export function ComprovanteImpressao({
   
   // Buscar itens do pedido
   const { data: itensPedido = [], isLoading: itensLoading } = useQuery({
-    queryKey: ['/api/pedidos/itens', pedidoId],
+    queryKey: [`/api/pedidos/${pedidoId}/itens`],
     enabled: !!pedidoId && isOpen,
   });
   
