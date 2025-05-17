@@ -54,7 +54,7 @@ export function ItemEstoque({ item }: ItemEstoqueProps) {
           <div className="flex flex-col">
             <span className="text-xs text-muted-foreground">Preço Unitário</span>
             <span className="font-medium">
-              {formatCurrency(item.precoUnitario)}
+              {formatCurrency(item.valorUnitario || 0)}
             </span>
           </div>
           <div className="flex flex-col">

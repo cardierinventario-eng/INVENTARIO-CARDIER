@@ -95,27 +95,8 @@ export function NovoItemEstoqueDialog() {
         variant: "success",
       });
       
-      // Registrar a movimentação de estoque (entrada inicial)
-      if (data.quantidade > 0) {
-        try {
-          const itemCriado = await queryClient.fetchQuery({
-            queryKey: ['/api/estoque/ultimo'],
-          });
-          
-          if (itemCriado && itemCriado.id) {
-            await apiRequest("/api/estoque/movimentacoes", "POST", {
-              itemEstoqueId: itemCriado.id,
-              tipo: "entrada",
-              quantidade: data.quantidade,
-              responsavel: "Sistema",
-              observacoes: "Estoque inicial do item"
-            });
-          }
-        } catch (movError) {
-          console.error("Erro ao registrar movimentação:", movError);
-          // Continuar mesmo com erro na movimentação
-        }
-      }
+      // Registrar a movimentação de estoque será implementada depois
+      // Pois estamos focando em corrigir o cadastro de itens primeiro
       
       // Invalidar cache para atualizar listagens
       queryClient.invalidateQueries({ queryKey: ['/api/estoque'] });

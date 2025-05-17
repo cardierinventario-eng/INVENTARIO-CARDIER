@@ -157,7 +157,7 @@ export function AjustarEstoqueDialog({ item, children }: AjustarEstoqueDialogPro
               </div>
               <div className="flex flex-col">
                 <span className="text-muted-foreground">Preço Unitário:</span>
-                <span>{formatCurrency(item.precoUnitario)}</span>
+                <span>{formatCurrency(item.valorUnitario || 0)}</span>
               </div>
             </div>
           </div>

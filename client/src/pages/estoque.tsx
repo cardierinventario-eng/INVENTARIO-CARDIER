@@ -174,8 +174,8 @@ export default function Estoque() {
                               <td className="py-2 px-3 border">{item.quantidade} {item.unidade}</td>
                               <td className="py-2 px-3 border">{item.estoqueMinimo} {item.unidade}</td>
                               <td className="py-2 px-3 border">{item.estoqueIdeal} {item.unidade}</td>
-                              <td className="py-2 px-3 border">R$ {parseFloat(item.precoUnitario).toFixed(2)}</td>
-                              <td className="py-2 px-3 border">R$ {(item.quantidade * parseFloat(item.precoUnitario)).toFixed(2)}</td>
+                              <td className="py-2 px-3 border">R$ {(parseFloat(item.valorUnitario || '0')).toFixed(2)}</td>
+                              <td className="py-2 px-3 border">R$ {(parseFloat(item.quantidade || '0') * parseFloat(item.valorUnitario || '0')).toFixed(2)}</td>
                             </tr>
                           ))}
                         </tbody>
