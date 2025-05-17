@@ -51,7 +51,9 @@ export default function Estoque() {
   });
 
   // Agrupar por categoria para exibir na interface
-  const categorias = [...new Set(itensEstoque?.map(item => item.categoria) || [])];
+  // Cria um array de categorias únicas
+  const categoriasArray = itensEstoque?.map(item => item.categoria) || [];
+  const categorias = Array.from(new Set(categoriasArray));
 
   return (
     <>

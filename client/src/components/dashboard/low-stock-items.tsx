@@ -158,7 +158,8 @@ export function LowStockItems() {
               ) : (
                 <li className="p-5 text-center text-neutral-dark flex flex-col items-center">
                   <AlertTriangle className="h-8 w-8 mb-2 text-success" />
-                  <span>Nenhum item com estoque baixo</span>
+                  <span className="font-medium">Estoque em dia!</span>
+                  <span className="text-sm mt-1">Todos os itens estão com níveis adequados</span>
                 </li>
               )}
             </ul>

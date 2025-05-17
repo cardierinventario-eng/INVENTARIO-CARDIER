@@ -1,10 +1,13 @@
 import { useQuery } from "@tanstack/react-query";
+import { useEffect } from "react";
 import { StatCard } from "@/components/dashboard/stat-card";
 import { RecentOrders } from "@/components/dashboard/recent-orders";
 import { LowStockItems } from "@/components/dashboard/low-stock-items";
 import { QuickActions } from "@/components/dashboard/quick-actions";
 import { RestaurantStatus } from "@/components/dashboard/restaurant-status";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useToast } from "@/hooks/use-toast";
+import { AlertTriangle } from "lucide-react";
 
 interface DashboardStats {
   pedidosHoje: number;
@@ -18,9 +21,22 @@ interface DashboardStats {
 }
 
 export default function Dashboard() {
+  const { toast } = useToast();
   const { data: stats, isLoading } = useQuery<DashboardStats>({
     queryKey: ['/api/dashboard/stats'],
   });
+  
+  // Efeito para mostrar alerta quando houver itens com estoque baixo
+  useEffect(() => {
+    if (stats && stats.itensEstoqueBaixo > 0) {
+      toast({
+        title: "Alerta de Estoque",
+        description: `${stats.itensEstoqueBaixo} ${stats.itensEstoqueBaixo === 1 ? "item está" : "itens estão"} com estoque abaixo do mínimo.`,
+        variant: "destructive",
+        icon: <AlertTriangle className="h-4 w-4" />
+      });
+    }
+  }, [stats?.itensEstoqueBaixo, toast]);
 
   return (
     <>
