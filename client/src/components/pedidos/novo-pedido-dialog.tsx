@@ -223,20 +223,86 @@ export function NovoPedidoDialog({ open = false, onOpenChange }: NovoPedidoDialo
     // Estilo para impressão
     const style = `
       <style>
-        body { font-family: Arial, sans-serif; margin: 0; padding: 20px; }
-        .header { text-align: center; margin-bottom: 20px; border-bottom: 1px solid #ccc; padding-bottom: 10px; }
-        .titulo { font-size: 18px; font-weight: bold; margin-bottom: 5px; }
-        .subtitulo { font-size: 14px; margin-bottom: 5px; }
-        .info-row { display: flex; margin-bottom: 5px; }
-        .info-label { font-weight: bold; width: 120px; }
-        .info-value { flex: 1; }
-        .tabela { width: 100%; border-collapse: collapse; margin: 15px 0; }
-        .tabela th, .tabela td { border-bottom: 1px solid #eee; padding: 8px; text-align: left; }
-        .tabela th { font-weight: bold; border-bottom: 2px solid #ddd; }
-        .total-row { font-weight: bold; margin-top: 15px; text-align: right; }
-        .observacoes { margin-top: 20px; }
-        .observacoes-titulo { font-weight: bold; margin-bottom: 5px; }
-        .footer { margin-top: 30px; text-align: center; font-size: 12px; border-top: 1px solid #ccc; padding-top: 10px; }
+        @page {
+          size: 80mm 200mm;  /* Tamanho de papel de impressora térmica comum */
+          margin: 5mm;      /* Margem reduzida */
+        }
+        body { 
+          font-family: Arial, sans-serif; 
+          margin: 0; 
+          padding: 0;
+          width: 70mm;      /* Largura para impressora térmica */
+          margin: 0 auto;   /* Centralizar conteúdo */
+        }
+        .container {
+          width: 100%;
+          max-width: 70mm;
+          margin: 0 auto;
+        }
+        .header { 
+          text-align: center; 
+          margin-bottom: 10px; 
+          border-bottom: 1px solid #ccc; 
+          padding-bottom: 5px; 
+        }
+        .titulo { 
+          font-size: 14px; 
+          font-weight: bold; 
+          margin-bottom: 3px; 
+        }
+        .subtitulo { 
+          font-size: 12px; 
+          margin-bottom: 3px; 
+        }
+        .info-row { 
+          display: flex; 
+          margin-bottom: 3px;
+          font-size: 10px;
+        }
+        .info-label { 
+          font-weight: bold; 
+          width: 80px; 
+        }
+        .info-value { 
+          flex: 1; 
+        }
+        .tabela { 
+          width: 100%; 
+          border-collapse: collapse; 
+          margin: 8px 0;
+          font-size: 9px;
+        }
+        .tabela th, .tabela td { 
+          border-bottom: 1px solid #eee; 
+          padding: 4px; 
+          text-align: left; 
+        }
+        .tabela th { 
+          font-weight: bold; 
+          border-bottom: 1px solid #ddd; 
+        }
+        .total-row { 
+          font-weight: bold; 
+          margin-top: 8px;
+          margin-bottom: 8px;
+          text-align: right;
+          font-size: 12px;
+        }
+        .observacoes { 
+          margin-top: 8px;
+          font-size: 9px;
+        }
+        .observacoes-titulo { 
+          font-weight: bold; 
+          margin-bottom: 2px; 
+        }
+        .footer { 
+          margin-top: 10px; 
+          text-align: center; 
+          font-size: 9px; 
+          border-top: 1px solid #ccc; 
+          padding-top: 5px; 
+        }
       </style>
     `;
     
@@ -280,66 +346,68 @@ export function NovoPedidoDialog({ open = false, onOpenChange }: NovoPedidoDialo
         ${style}
       </head>
       <body>
-        <div class="header">
-          <div class="titulo">LANCHE FÁCIL</div>
-          <div class="subtitulo">COMPROVANTE DE PEDIDO</div>
-        </div>
-        
-        <div class="info-row">
-          <div class="info-label">Número:</div>
-          <div class="info-value">${pedidoCriado.numero}</div>
-        </div>
-        
-        <div class="info-row">
-          <div class="info-label">Data/Hora:</div>
-          <div class="info-value">${dataFormatada}</div>
-        </div>
-        
-        <div class="info-row">
-          <div class="info-label">Tipo:</div>
-          <div class="info-value">${tipoTexto}</div>
-        </div>
-        
-        ${pedidoCriado.nomeCliente ? `
-        <div class="info-row">
-          <div class="info-label">Cliente:</div>
-          <div class="info-value">${pedidoCriado.nomeCliente}</div>
-        </div>
-        ` : ''}
-        
-        <div class="info-row">
-          <div class="info-label">Pagamento:</div>
-          <div class="info-value">${formaPagamentoTexto}</div>
-        </div>
-        
-        <table class="tabela">
-          <thead>
-            <tr>
-              <th>Item</th>
-              <th style="text-align: center">Qtd</th>
-              <th style="text-align: right">Preço</th>
-              <th style="text-align: right">Total</th>
-            </tr>
-          </thead>
-          <tbody>
-            ${itensHtml}
-          </tbody>
-        </table>
-        
-        <div class="total-row">
-          TOTAL: R$ ${valorTotal.toFixed(2)}
-        </div>
-        
-        ${pedidoCriado.observacoes ? `
-        <div class="observacoes">
-          <div class="observacoes-titulo">Observações:</div>
-          <div>${pedidoCriado.observacoes}</div>
-        </div>
-        ` : ''}
-        
-        <div class="footer">
-          Agradecemos pela preferência!<br>
-          LANCHE FÁCIL - Seu restaurante completo
+        <div class="container">
+          <div class="header">
+            <div class="titulo">LANCHE FÁCIL</div>
+            <div class="subtitulo">COMPROVANTE DE PEDIDO</div>
+          </div>
+          
+          <div class="info-row">
+            <div class="info-label">Número:</div>
+            <div class="info-value">${pedidoCriado.numero}</div>
+          </div>
+          
+          <div class="info-row">
+            <div class="info-label">Data/Hora:</div>
+            <div class="info-value">${dataFormatada}</div>
+          </div>
+          
+          <div class="info-row">
+            <div class="info-label">Tipo:</div>
+            <div class="info-value">${tipoTexto}</div>
+          </div>
+          
+          ${pedidoCriado.nomeCliente ? `
+          <div class="info-row">
+            <div class="info-label">Cliente:</div>
+            <div class="info-value">${pedidoCriado.nomeCliente}</div>
+          </div>
+          ` : ''}
+          
+          <div class="info-row">
+            <div class="info-label">Pagamento:</div>
+            <div class="info-value">${formaPagamentoTexto}</div>
+          </div>
+          
+          <table class="tabela">
+            <thead>
+              <tr>
+                <th>Item</th>
+                <th style="text-align: center">Qtd</th>
+                <th style="text-align: right">Preço</th>
+                <th style="text-align: right">Total</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${itensHtml}
+            </tbody>
+          </table>
+          
+          <div class="total-row">
+            TOTAL: R$ ${valorTotal.toFixed(2)}
+          </div>
+          
+          ${pedidoCriado.observacoes ? `
+          <div class="observacoes">
+            <div class="observacoes-titulo">Observações:</div>
+            <div>${pedidoCriado.observacoes}</div>
+          </div>
+          ` : ''}
+          
+          <div class="footer">
+            Agradecemos pela preferência!<br>
+            LANCHE FÁCIL - Seu restaurante completo
+          </div>
         </div>
       </body>
       </html>
