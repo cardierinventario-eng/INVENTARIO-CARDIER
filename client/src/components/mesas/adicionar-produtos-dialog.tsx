@@ -144,9 +144,9 @@ export function AdicionarProdutosDialog({ mesa, aberto, aoFechar }: AdicionarPro
           observacoes: "",
           status: "em preparo",
           numero: Math.floor(Math.random() * 9000) + 1000, // número aleatório de 4 dígitos
-          valorTotal: 0, // Valor inicial zero
-          valorDesconto: 0, // Valor inicial zero
-          taxaServico: 0, // Valor inicial zero
+          valorTotal: "0.00", // Valor inicial zero como string
+          valorDesconto: "0.00", // Valor inicial zero como string
+          taxaServico: "0.00", // Valor inicial zero como string
           formaPagamento: "dinheiro" // Valor padrão
         };
         
