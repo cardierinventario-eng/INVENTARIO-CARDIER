@@ -233,8 +233,10 @@ export default function Pedidos() {
       </Tabs>
       
       <NovoPedidoDialog 
-        open={isDialogOpen} 
-        onOpenChange={setIsDialogOpen} 
+        open={isDialogOpen}
+        isOpen={mostrarNovoPedido}
+        onOpenChange={setIsDialogOpen}
+        mesaIdPreSelecionada={mesaId}
       />
       
       {pedidoSelecionado && (

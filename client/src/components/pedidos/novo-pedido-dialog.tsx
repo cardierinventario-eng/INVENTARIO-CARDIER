@@ -77,11 +77,20 @@ type ItemPedido = z.infer<typeof itemSchema>;
 
 interface NovoPedidoDialogProps {
   open?: boolean;
+  isOpen?: boolean;
   onOpenChange?: (open: boolean) => void;
+  mesaIdPreSelecionada?: number;
 }
 
-export function NovoPedidoDialog({ open = false, onOpenChange }: NovoPedidoDialogProps) {
-  const [isOpen, setIsOpen] = useState(open);
+export function NovoPedidoDialog({ 
+  open = false, 
+  isOpen: externalIsOpen, 
+  onOpenChange, 
+  mesaIdPreSelecionada 
+}: NovoPedidoDialogProps) {
+  // Determinar estado inicial - aberto se qualquer uma das props de abertura for true
+  const initialIsOpen = open || externalIsOpen || false;
+  const [isOpen, setIsOpen] = useState(initialIsOpen);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [itensSelecionados, setItensSelecionados] = useState<ItemPedido[]>([]);
   const [pedidoCriado, setPedidoCriado] = useState<any>(null);
@@ -125,17 +134,26 @@ export function NovoPedidoDialog({ open = false, onOpenChange }: NovoPedidoDialo
     },
   });
 
-  // Sincronizar estado local e propriedade externa
+  // Sincronizar estado local e propriedades externas
   useEffect(() => {
-    if (isOpen !== open) {
-      setIsOpen(open);
+    const shouldBeOpen = open || externalIsOpen || false;
+    if (isOpen !== shouldBeOpen) {
+      setIsOpen(shouldBeOpen);
     }
-  }, [open]);
+  }, [open, externalIsOpen]);
   
   // Quando o estado local muda, notificar o pai
   useEffect(() => {
     onOpenChange?.(isOpen);
   }, [isOpen, onOpenChange]);
+  
+  // Pré-selecionar mesa e tipo quando mesaIdPreSelecionada é fornecido
+  useEffect(() => {
+    if (mesaIdPreSelecionada && form) {
+      form.setValue('tipo', 'mesa');
+      form.setValue('mesaId', mesaIdPreSelecionada);
+    }
+  }, [mesaIdPreSelecionada, form]);
 
   // Resetar formulário quando modal é fechado
   useEffect(() => {
