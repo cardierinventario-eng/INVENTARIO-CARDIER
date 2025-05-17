@@ -5,12 +5,14 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { DatePickerWithRange } from "@/components/ui/date-range-picker";
 import { useToast } from "@/hooks/use-toast";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { Bar, Line, Pie } from "recharts";
 import { PDFDownloadLink } from "@react-pdf/renderer";
-import { RelatorioVendas, RelatorioFinanceiro, RelatorioEstoque } from "@/shared/schema";
-import { Loader2, Download, Mail, Printer, Share2 } from "lucide-react";
+import { RelatorioVendas, RelatorioFinanceiro, RelatorioEstoque } from "@shared/schema";
+import { Loader2, Download, Mail, Printer, Share2, RefreshCcw } from "lucide-react";
+import { RelatorioVendasPDF } from "@/components/relatorios/relatorio-vendas-pdf";
+import { CompartilharRelatorioDialog } from "@/components/relatorios/compartilhar-relatorio-dialog";
 
 export default function Relatorios() {
   const [, setLocation] = useLocation();
@@ -19,6 +21,7 @@ export default function Relatorios() {
   const tipoRelatorio = params.get("tipo") || "vendas";
   const [tabValue, setTabValue] = useState(tipoRelatorio);
   const { toast } = useToast();
+  const queryClient = useQueryClient();
 
   // Atualiza a URL quando a tab muda
   useEffect(() => {
@@ -55,32 +58,56 @@ export default function Relatorios() {
     enabled: tabValue === "estoque",
   });
 
-  const handleExportarPDF = () => {
-    toast({
-      title: "Funcionalidade em desenvolvimento",
-      description: "A exportação para PDF será implementada em breve.",
-    });
+  // Mutação para zerar dados de vendas
+  const zerarVendasMutation = useMutation({
+    mutationFn: () => apiRequest('/api/relatorios/vendas/zerar', 'POST'),
+    onSuccess: () => {
+      // Revalidar queries após zerar os dados
+      queryClient.invalidateQueries({ queryKey: ['/api/relatorios/vendas'] });
+      toast({
+        title: "Relatório zerado",
+        description: "Os dados de vendas foram zerados. Novas contagens começarão a partir da próxima venda.",
+      });
+    },
+    onError: (error) => {
+      toast({
+        title: "Erro ao zerar dados",
+        description: "Não foi possível zerar os dados de vendas. Tente novamente.",
+        variant: "destructive",
+      });
+      console.error("Erro ao zerar relatório:", error);
+    }
+  });
+
+  const handleZerarRelatorio = () => {
+    if (window.confirm("Tem certeza que deseja zerar todos os dados do relatório de vendas? Esta ação não pode ser desfeita.")) {
+      zerarVendasMutation.mutate();
+    }
   };
 
-  const handleEnviarEmail = () => {
-    toast({
-      title: "Funcionalidade em desenvolvimento",
-      description: "O envio por e-mail será implementado em breve.",
-    });
+  const handleExportarPDF = () => {
+    // Agora usamos PDFDownloadLink diretamente nos botões
+    if (!relatorioVendas && tabValue === "vendas") {
+      toast({
+        title: "Sem dados para exportar",
+        description: "Não há dados de vendas disponíveis para exportar.",
+      });
+      return;
+    }
+    
+    // A exportação real acontecerá através do PDFDownloadLink
   };
 
   const handleImprimir = () => {
-    toast({
-      title: "Funcionalidade em desenvolvimento",
-      description: "A impressão será implementada em breve.",
-    });
-  };
-
-  const handleCompartilhar = () => {
-    toast({
-      title: "Funcionalidade em desenvolvimento", 
-      description: "O compartilhamento será implementado em breve.",
-    });
+    if (tabValue === "vendas" && relatorioVendas) {
+      // Usar a função de impressão do navegador
+      window.print();
+    } else {
+      toast({
+        title: "Sem dados para imprimir",
+        description: "Não há dados disponíveis para impressão.",
+      });
+    }
   };
 
   return (
@@ -88,22 +115,58 @@ export default function Relatorios() {
       <div className="flex justify-between items-center">
         <h1 className="text-2xl font-bold">Relatórios</h1>
         <div className="flex space-x-2">
-          <Button variant="outline" size="sm" onClick={handleExportarPDF}>
-            <Download className="h-4 w-4 mr-2" />
-            Exportar PDF
-          </Button>
-          <Button variant="outline" size="sm" onClick={handleEnviarEmail}>
-            <Mail className="h-4 w-4 mr-2" />
-            Enviar Email
-          </Button>
+          {tabValue === "vendas" && relatorioVendas && (
+            <PDFDownloadLink
+              document={<RelatorioVendasPDF relatorio={relatorioVendas} />}
+              fileName={`relatorio-vendas-${new Date().toLocaleDateString('pt-BR').replace(/\//g, '-')}.pdf`}
+              className="inline-flex"
+            >
+              {({ loading }) => (
+                <Button variant="outline" size="sm" disabled={loading}>
+                  {loading ? (
+                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                  ) : (
+                    <Download className="h-4 w-4 mr-2" />
+                  )}
+                  Exportar PDF
+                </Button>
+              )}
+            </PDFDownloadLink>
+          )}
+          {tabValue === "vendas" && !relatorioVendas && (
+            <Button variant="outline" size="sm" onClick={handleExportarPDF}>
+              <Download className="h-4 w-4 mr-2" />
+              Exportar PDF
+            </Button>
+          )}
+          
           <Button variant="outline" size="sm" onClick={handleImprimir}>
             <Printer className="h-4 w-4 mr-2" />
             Imprimir
           </Button>
-          <Button variant="outline" size="sm" onClick={handleCompartilhar}>
-            <Share2 className="h-4 w-4 mr-2" />
-            Compartilhar
-          </Button>
+          
+          {tabValue === "vendas" && relatorioVendas && (
+            <CompartilharRelatorioDialog 
+              tipo="vendas" 
+              dados={relatorioVendas}
+            />
+          )}
+          
+          {tabValue === "vendas" && (
+            <Button 
+              variant="outline" 
+              size="sm" 
+              onClick={handleZerarRelatorio} 
+              disabled={zerarVendasMutation.isPending}
+            >
+              {zerarVendasMutation.isPending ? (
+                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+              ) : (
+                <RefreshCcw className="h-4 w-4 mr-2" />
+              )}
+              Zerar Relatório
+            </Button>
+          )}
         </div>
       </div>
 
