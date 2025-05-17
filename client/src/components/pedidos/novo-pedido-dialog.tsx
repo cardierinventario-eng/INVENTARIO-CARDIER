@@ -238,14 +238,15 @@ export function NovoPedidoDialog({ open = false, onOpenChange }: NovoPedidoDialo
       const pedidoId = pedidoCriado.id;
       
       try {
-        // Usar endpoint simplificado
+        // Usar endpoint simplificado com os campos corretos
         for (const item of itensSelecionados) {
           await apiRequest("POST", "/api/pedidos/itens", {
             pedidoId: pedidoId,
-            itemId: item.id,
+            itemCardapioId: item.id,  // Nome correto do campo conforme o schema
             nome: item.nome,
             preco: typeof item.preco === 'string' ? item.preco : item.preco.toString(),
-            quantidade: item.quantidade
+            quantidade: item.quantidade,
+            observacoes: ""  // Campo opcional mas incluído para completar o schema
           });
         }
       } catch (itemError) {
