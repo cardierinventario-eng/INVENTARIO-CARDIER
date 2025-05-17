@@ -706,8 +706,13 @@ export function NovoPedidoDialog({ open = false, onOpenChange }: NovoPedidoDialo
                         <FormItem>
                           <FormLabel>Mesa*</FormLabel>
                           <Select 
-                            onValueChange={(value) => field.onChange(parseInt(value))} 
-                            defaultValue={field.value?.toString()}
+                            onValueChange={(value) => {
+                              // Verificar se é um valor válido antes de converter
+                              if (value) {
+                                field.onChange(parseInt(value));
+                              }
+                            }} 
+                            value={field.value?.toString() || undefined}
                           >
                             <FormControl>
                               <SelectTrigger>
@@ -715,11 +720,15 @@ export function NovoPedidoDialog({ open = false, onOpenChange }: NovoPedidoDialo
                               </SelectTrigger>
                             </FormControl>
                             <SelectContent>
-                              {mesasDisponiveis.map((mesa: any) => (
-                                <SelectItem key={mesa.id} value={mesa.id.toString()}>
-                                  Mesa {mesa.numero} - {mesa.capacidade} lugares
-                                </SelectItem>
-                              ))}
+                              {Array.isArray(mesasDisponiveis) && mesasDisponiveis.length > 0 ? (
+                                mesasDisponiveis.map((mesa: any) => (
+                                  <SelectItem key={mesa.id} value={mesa.id.toString()}>
+                                    Mesa {mesa.numero} - {mesa.capacidade} lugares
+                                  </SelectItem>
+                                ))
+                              ) : (
+                                <SelectItem value="sem-mesas">Não há mesas disponíveis</SelectItem>
+                              )}
                             </SelectContent>
                           </Select>
                           <FormMessage />
