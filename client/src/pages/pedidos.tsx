@@ -38,6 +38,17 @@ export default function Pedidos() {
   const [filtroStatus, setFiltroStatus] = useState<string>("todos");
   const [filtroTexto, setFiltroTexto] = useState<string>("");
   
+  // Verificar se existe parâmetro de mesa e ação na URL
+  const urlParams = new URLSearchParams(window.location.search);
+  const mesaIdParam = urlParams.get('mesa');
+  const acaoParam = urlParams.get('acao');
+  
+  // Se tiver o parâmetro de mesa e a ação for "adicionar", abrir o diálogo de novo pedido
+  const mostrarNovoPedido = mesaIdParam !== null && acaoParam === 'adicionar';
+  
+  // Converter mesaId para número se existir
+  const mesaId = mesaIdParam ? parseInt(mesaIdParam) : undefined;
+  
   const { data: pedidos, isLoading } = useQuery<Pedido[]>({
     queryKey: ['/api/pedidos'],
   });

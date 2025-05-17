@@ -190,18 +190,17 @@ export default function Mesas() {
                   </Button>
                   
                   {/* Botão para adicionar produtos à mesa */}
-                  <AdicionarProdutosMesaDialog 
-                    mesa={mesa}
-                    trigger={
-                      <Button 
-                        variant="default"
-                        className="gap-1 flex-1"
-                      >
-                        <ShoppingCart className="h-4 w-4" />
-                        Produtos
-                      </Button>
-                    }
-                  />
+                  <Button 
+                    variant="default"
+                    className="gap-1 flex-1"
+                    onClick={() => {
+                      // Navegar para a página de pedidos com query para mesa
+                      window.location.href = `/pedidos?mesa=${mesa.id}&acao=adicionar`;
+                    }}
+                  >
+                    <ShoppingCart className="h-4 w-4" />
+                    Produtos
+                  </Button>
                   
                   {/* Botão para visualizar pedido da mesa, se estiver ocupada */}
                   {mesa.status.toLowerCase() === 'ocupada' && (
