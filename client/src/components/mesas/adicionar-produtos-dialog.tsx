@@ -45,6 +45,9 @@ interface AdicionarProdutosDialogProps {
 }
 
 export function AdicionarProdutosDialog({ mesa, aberto, aoFechar }: AdicionarProdutosDialogProps) {
+  // Renderizar somente quando estiver realmente aberto
+  if (!aberto) return null;
+
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [itemSelecionadoId, setItemSelecionadoId] = useState<number | undefined>(undefined);
   const [quantidade, setQuantidade] = useState(1);
@@ -215,7 +218,7 @@ export function AdicionarProdutosDialog({ mesa, aberto, aoFechar }: AdicionarPro
   };
   
   return (
-    <Dialog open={aberto} onOpenChange={(open) => !open && handleOnClose()}>
+    <Dialog open={true} onOpenChange={(open) => !open && handleOnClose()}>
       <DialogContent className="sm:max-w-[600px]">
         <DialogHeader>
           <DialogTitle>Adicionar Produtos à Mesa {mesa.numero}</DialogTitle>
