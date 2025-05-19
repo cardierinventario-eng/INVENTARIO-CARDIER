@@ -184,15 +184,39 @@ export default function Estoque() {
             ) : (
               <div className="p-16 text-center bg-white rounded-lg shadow">
                 <div className="mx-auto w-24 h-24 bg-muted rounded-full flex items-center justify-center mb-6">
-                  <Package className="h-12 w-12 text-muted-foreground" />
+                  {buscaAtiva ? (
+                    <Barcode className="h-12 w-12 text-muted-foreground" />
+                  ) : (
+                    <Package className="h-12 w-12 text-muted-foreground" />
+                  )}
                 </div>
                 <h3 className="text-lg font-semibold mb-2">Nenhum item encontrado</h3>
                 <p className="text-muted-foreground mb-6">
-                  {filtro ? 
-                    `Não encontramos itens correspondentes à sua busca "${filtro}"` : 
-                    "Ainda não existem itens cadastrados no estoque."}
+                  {buscaAtiva ? (
+                    <>
+                      Não encontramos nenhum produto com o código de barras <strong>{codigoBarras}</strong>.<br />
+                      Este produto pode não estar cadastrado no sistema.
+                    </>
+                  ) : filtro ? (
+                    `Não encontramos itens correspondentes à sua busca "${filtro}"`
+                  ) : (
+                    "Ainda não existem itens cadastrados no estoque."
+                  )}
                 </p>
-                <NovoItemEstoqueDialog />
+                {buscaAtiva ? (
+                  <Button 
+                    variant="outline"
+                    onClick={() => {
+                      setCodigoBarras(null);
+                      setBuscaAtiva(false);
+                    }}
+                    className="mr-2"
+                  >
+                    Limpar busca
+                  </Button>
+                ) : (
+                  <NovoItemEstoqueDialog />
+                )}
               </div>
             )}
             
