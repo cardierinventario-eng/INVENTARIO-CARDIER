@@ -106,6 +106,7 @@ export const itensEstoque = pgTable("itens_estoque", {
   valorUnitario: decimal("valor_unitario", { precision: 10, scale: 2 }),
   estoqueMinimo: decimal("estoque_minimo", { precision: 10, scale: 2 }).notNull(),
   estoqueIdeal: decimal("estoque_ideal", { precision: 10, scale: 2 }).notNull(),
+  codigoBarras: text("codigo_barras"),
   dataCriacao: timestamp("data_criacao").defaultNow(),
   ultimaAtualizacao: timestamp("ultima_atualizacao").defaultNow(),
 });

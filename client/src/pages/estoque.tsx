@@ -21,11 +21,13 @@ import {
   Package,
   PackageCheck,
   PackageX,
+  Barcode,
 } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { type ItemEstoque as ItemEstoqueType } from "@shared/schema";
 
 import { NovoItemEstoqueDialog } from "@/components/estoque/novo-item-estoque-dialog";
+import { DialogCodigoBarras } from "@/components/codigo-barras/dialog-codigo-barras";
 
 export default function Estoque() {
   const [filtro, setFiltro] = useState("");
@@ -98,13 +100,25 @@ export default function Estoque() {
         </TabsList>
         
         <div className="flex justify-between items-center my-4">
-          <div className="relative w-64">
-            <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
-            <Input
-              placeholder="Buscar itens..."
-              className="pl-8"
-              value={filtro}
-              onChange={(e) => setFiltro(e.target.value)}
+          <div className="flex gap-2 items-center">
+            <div className="relative w-64">
+              <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+              <Input
+                placeholder="Buscar itens..."
+                className="pl-8"
+                value={filtro}
+                onChange={(e) => setFiltro(e.target.value)}
+              />
+            </div>
+            <DialogCodigoBarras 
+              onScan={(codigoBarras) => setFiltro(codigoBarras)}
+              titulo="Leitor de Código de Barras"
+              descricao="Escaneie o código de barras para buscar o produto no estoque"
+              trigger={
+                <Button variant="outline" size="icon" title="Ler código de barras">
+                  <Barcode className="h-4 w-4" />
+                </Button>
+              }
             />
           </div>
           
