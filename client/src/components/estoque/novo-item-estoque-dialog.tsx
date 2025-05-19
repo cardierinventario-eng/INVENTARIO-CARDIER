@@ -64,6 +64,7 @@ export function NovoItemEstoqueDialog() {
       precoUnitario: "",
       descricao: "",
       localArmazenamento: "",
+      codigoBarras: "",
     },
   });
   
@@ -86,7 +87,8 @@ export function NovoItemEstoqueDialog() {
         unidade: data.unidade,
         valorUnitario: data.precoUnitario.replace(",", "."),
         estoqueMinimo: data.estoqueMinimo.toString(),
-        estoqueIdeal: data.estoqueIdeal.toString()
+        estoqueIdeal: data.estoqueIdeal.toString(),
+        codigoBarras: data.codigoBarras || ""
       };
       
       await apiRequest("/api/estoque", "POST", novoItem);
@@ -249,6 +251,40 @@ export function NovoItemEstoqueDialog() {
                   <FormControl>
                     <Input placeholder="Ex: Freezer 1, Prateleira A" {...field} />
                   </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            
+            <FormField
+              control={form.control}
+              name="codigoBarras"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Código de Barras</FormLabel>
+                  <div className="flex gap-2">
+                    <FormControl>
+                      <Input 
+                        placeholder="Digite ou escaneie o código de barras" 
+                        {...field} 
+                      />
+                    </FormControl>
+                    <DialogCodigoBarras
+                      onScan={(codigoBarras) => form.setValue("codigoBarras", codigoBarras)}
+                      titulo="Leitura de Código de Barras"
+                      descricao="Escaneie o código de barras do produto para cadastro"
+                      trigger={
+                        <Button 
+                          type="button" 
+                          variant="outline" 
+                          size="icon"
+                          title="Ler código de barras"
+                        >
+                          <Barcode className="h-4 w-4" />
+                        </Button>
+                      }
+                    />
+                  </div>
                   <FormMessage />
                 </FormItem>
               )}
