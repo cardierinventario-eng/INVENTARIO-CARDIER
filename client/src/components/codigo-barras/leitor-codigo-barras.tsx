@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "@/hooks/use-toast";
-import { QrCode, Barcode, Camera, X } from "lucide-react";
+import { QrCode, Barcode, Camera, X, RefreshCw } from "lucide-react";
 
 // Propriedades do componente
 interface LeitorCodigoBarrasProps {
@@ -14,9 +14,16 @@ interface LeitorCodigoBarrasProps {
   descricao?: string;
 }
 
-// Configurações padrão do scanner
-const qrConfig = { fps: 10, qrbox: { width: 250, height: 250 } };
-const aspectRatio = 1.77778; // 16:9
+// Configurações do scanner
+const qrConfig = { 
+  fps: 15, // Taxa de quadros mais alta para melhor detecção
+  qrbox: { width: 250, height: 150 },
+  // Configuração mais simples para melhor compatibilidade
+  experimentalFeatures: {
+    useBarCodeDetectorIfSupported: true
+  }
+};
+const aspectRatio = 1.33; // 4:3 para melhor visualização da câmera
 
 export function LeitorCodigoBarras({
   onScan,
@@ -61,8 +68,21 @@ export function LeitorCodigoBarras({
         // Limpar o conteúdo do container e adicionar o elemento reader
         const scannerContainer = document.querySelector("#scanner-container");
         if (scannerContainer) {
+          // Limpar qualquer conteúdo existente
           scannerContainer.innerHTML = "";
           scannerContainer.appendChild(readerElement);
+        } else {
+          console.error("Container para scanner não encontrado");
+          return;
+        }
+      }
+      
+      // Se o scanner já estiver em uso, pare-o primeiro
+      if (scannerRef.current) {
+        try {
+          await scannerRef.current.stop();
+        } catch (err) {
+          console.log("Erro ao parar scanner existente:", err);
         }
       }
       
@@ -94,8 +114,13 @@ export function LeitorCodigoBarras({
             // Processamento de sucesso
             handleScan(decodedText);
           },
-          () => {
-            // Função de erro - não fazer nada para evitar logs de erro constantes
+          (errorMessage) => {
+            // Logar apenas erros importantes - não mostrar pequenos erros de leitura
+            if (errorMessage.includes("Permission") || 
+                errorMessage.includes("not found") || 
+                errorMessage.includes("failed")) {
+              console.error("Erro de scanner:", errorMessage);
+            }
           }
         );
         
