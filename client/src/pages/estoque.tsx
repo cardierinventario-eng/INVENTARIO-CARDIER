@@ -32,9 +32,20 @@ import { DialogCodigoBarras } from "@/components/codigo-barras/dialog-codigo-bar
 export default function Estoque() {
   const [filtro, setFiltro] = useState("");
   const [categoriaAtiva, setCategoriaAtiva] = useState("todos");
+  const [codigoBarras, setCodigoBarras] = useState<string | null>(null);
+  const [buscaAtiva, setBuscaAtiva] = useState(false);
   
   const { data: itensEstoque, isLoading } = useQuery<ItemEstoqueType[]>({
-    queryKey: ['/api/estoque'],
+    queryKey: ['/api/estoque', codigoBarras],
+    queryFn: async () => {
+      setBuscaAtiva(!!codigoBarras);
+      const url = codigoBarras 
+        ? `/api/estoque?codigoBarras=${encodeURIComponent(codigoBarras)}`
+        : '/api/estoque';
+      const response = await fetch(url);
+      const data = await response.json();
+      return data;
+    }
   });
 
   // Filtrar itens por texto e/ou categoria
@@ -110,16 +121,39 @@ export default function Estoque() {
                 onChange={(e) => setFiltro(e.target.value)}
               />
             </div>
-            <DialogCodigoBarras 
-              onScan={(codigoBarras) => setFiltro(codigoBarras)}
-              titulo="Leitor de Código de Barras"
-              descricao="Escaneie o código de barras para buscar o produto no estoque"
-              trigger={
-                <Button variant="outline" size="icon" title="Ler código de barras">
-                  <Barcode className="h-4 w-4" />
+            {buscaAtiva ? (
+              <div className="flex items-center gap-2">
+                <div className="text-sm bg-yellow-100 text-yellow-800 px-3 py-1 rounded-md flex items-center">
+                  <Barcode className="h-4 w-4 mr-1" />
+                  <span>Filtrando por código: {codigoBarras}</span>
+                </div>
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  onClick={() => {
+                    setCodigoBarras(null);
+                    setBuscaAtiva(false);
+                  }}
+                >
+                  Limpar
                 </Button>
-              }
-            />
+              </div>
+            ) : (
+              <DialogCodigoBarras 
+                onScan={(codigo) => {
+                  setCodigoBarras(codigo);
+                  // Limpar o filtro de texto ao usar código de barras
+                  setFiltro("");
+                }}
+                titulo="Leitor de Código de Barras" 
+                descricao="Escaneie o código de barras para buscar o produto no estoque"
+                trigger={
+                  <Button variant="outline" size="icon" title="Ler código de barras">
+                    <Barcode className="h-4 w-4" />
+                  </Button>
+                }
+              />
+            )}
           </div>
           
           <div className="flex space-x-2">
