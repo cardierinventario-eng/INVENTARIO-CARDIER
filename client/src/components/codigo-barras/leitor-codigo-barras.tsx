@@ -100,7 +100,7 @@ export function LeitorCodigoBarras({
           ? devices[1].id  // Segunda câmera (geralmente traseira)
           : devices[0].id; // Ou primeira câmera disponível
           
-        // Iniciar escaneamento
+        // Iniciar escaneamento com configurações otimizadas
         await scannerRef.current.start(
           cameraId,
           {
@@ -108,7 +108,8 @@ export function LeitorCodigoBarras({
             qrbox: {
               width: Math.min(dimensions.width - 50, qrConfig.qrbox.width),
               height: Math.min(dimensions.height - 50, qrConfig.qrbox.height)
-            }
+            },
+            experimentalFeatures: qrConfig.experimentalFeatures
           },
           (decodedText) => {
             // Processamento de sucesso
@@ -247,6 +248,22 @@ export function LeitorCodigoBarras({
                 </div>
               )}
             </div>
+            
+            {/* Botão para reiniciar o scanner */}
+            <div className="flex justify-center mt-3">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => {
+                  stopScanner();
+                  setTimeout(() => startScanner(), 500);
+                }}
+                className="flex items-center gap-2"
+              >
+                <RefreshCw className="h-4 w-4" />
+                <span>Reiniciar câmera</span>
+              </Button>
+            </div>
           </TabsContent>
           
           <TabsContent value="manual" className="mt-0">
@@ -275,9 +292,12 @@ export function LeitorCodigoBarras({
         </CardContent>
       </Tabs>
       
-      <CardFooter className="flex justify-between">
+      <CardFooter className="flex flex-col gap-2">
         <p className="text-xs text-muted-foreground">
           Dica: Para melhor leitura, mantenha o código bem iluminado e centralizado.
+        </p>
+        <p className="text-xs text-muted-foreground">
+          Se a câmera não funcionar, tente usar o botão "Reiniciar câmera" ou digite o código manualmente na aba "Manual".
         </p>
       </CardFooter>
     </Card>
