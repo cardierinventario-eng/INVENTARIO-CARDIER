@@ -47,6 +47,25 @@ export function LeitorCodigoBarras({
     try {
       if (!containerRef.current) return;
       
+      // Verificar se o elemento reader já existe
+      let readerElement = document.getElementById("reader");
+      
+      // Se não existir, criar dinamicamente
+      if (!readerElement) {
+        console.log("Criando elemento reader dinamicamente");
+        readerElement = document.createElement("div");
+        readerElement.id = "reader";
+        readerElement.style.width = "100%";
+        readerElement.style.height = "100%";
+        
+        // Limpar o conteúdo do container e adicionar o elemento reader
+        const scannerContainer = document.querySelector("#scanner-container");
+        if (scannerContainer) {
+          scannerContainer.innerHTML = "";
+          scannerContainer.appendChild(readerElement);
+        }
+      }
+      
       const dimensions = getScannnerDimensions();
       
       // Criar o scanner
@@ -189,7 +208,7 @@ export function LeitorCodigoBarras({
         
         <CardContent ref={containerRef}>
           <TabsContent value="camera" className="mt-0">
-            <div className="h-[250px] flex items-center justify-center bg-muted/20 rounded-md overflow-hidden">
+            <div id="scanner-container" className="h-[250px] flex items-center justify-center bg-muted/20 rounded-md overflow-hidden">
               {isScanning ? (
                 <div id="reader" className="w-full h-full" />
               ) : (

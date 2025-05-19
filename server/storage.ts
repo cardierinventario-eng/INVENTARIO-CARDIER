@@ -55,6 +55,7 @@ export interface IStorage {
   getItensEstoque(): Promise<ItemEstoque[]>;
   getItensEstoqueBaixo(): Promise<ItemEstoque[]>;
   getItemEstoque(id: number): Promise<ItemEstoque | undefined>;
+  getItemEstoquePorCodigoBarras(codigoBarras: string): Promise<ItemEstoque | undefined>;
   createItemEstoque(item: InsertItemEstoque): Promise<ItemEstoque>;
   updateItemEstoque(id: number, item: Partial<InsertItemEstoque>): Promise<ItemEstoque | undefined>;
   ajustarQuantidadeEstoque(id: number, quantidade: number): Promise<ItemEstoque | undefined>;
@@ -362,6 +363,12 @@ export class MemStorage implements IStorage {
 
   async getItemEstoque(id: number): Promise<ItemEstoque | undefined> {
     return this.itensEstoque.get(id);
+  }
+  
+  async getItemEstoquePorCodigoBarras(codigoBarras: string): Promise<ItemEstoque | undefined> {
+    return Array.from(this.itensEstoque.values()).find(
+      item => item.codigoBarras === codigoBarras
+    );
   }
 
   async createItemEstoque(insertItem: InsertItemEstoque): Promise<ItemEstoque> {

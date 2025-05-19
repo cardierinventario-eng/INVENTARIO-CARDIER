@@ -330,6 +330,11 @@ export class DatabaseStorage implements IStorage {
     const [item] = await db.select().from(itensEstoque).where(eq(itensEstoque.id, id));
     return item || undefined;
   }
+  
+  async getItemEstoquePorCodigoBarras(codigoBarras: string): Promise<ItemEstoque | undefined> {
+    const [item] = await db.select().from(itensEstoque).where(eq(itensEstoque.codigoBarras, codigoBarras));
+    return item || undefined;
+  }
 
   async createItemEstoque(insertItem: InsertItemEstoque): Promise<ItemEstoque> {
     const [item] = await db.insert(itensEstoque).values(insertItem).returning();

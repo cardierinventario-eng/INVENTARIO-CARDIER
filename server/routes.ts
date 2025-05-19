@@ -227,6 +227,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Estoque
   app.get("/api/estoque", async (req, res) => {
+    // Verificar se há um código de barras na query
+    const codigoBarras = req.query.codigoBarras as string;
+    
+    if (codigoBarras) {
+      // Buscar por código de barras
+      const item = await storage.getItemEstoquePorCodigoBarras(codigoBarras);
+      if (item) {
+        // Retornar como array para manter consistência
+        return res.json([item]);
+      } else {
+        // Se não encontrar, retornar array vazio
+        return res.json([]);
+      }
+    }
+    
+    // Busca normal sem filtro
     const itens = await storage.getItensEstoque();
     res.json(itens);
   });
