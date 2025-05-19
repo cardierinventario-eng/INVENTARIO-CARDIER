@@ -64,6 +64,7 @@ export const itensCardapio = pgTable("itens_cardapio", {
   categoria: text("categoria").notNull(),
   disponivel: boolean("disponivel").default(true),
   imagem: text("imagem"),
+  codigoBarras: text("codigo_barras"),
   dataCriacao: timestamp("data_criacao").defaultNow(),
 });
 
@@ -75,6 +76,7 @@ export const insertItemCardapioSchema = createInsertSchema(itensCardapio).pick({
   categoria: true,
   disponivel: true,
   imagem: true,
+  codigoBarras: true,
 });
 
 // Schema para mesas
@@ -120,6 +122,7 @@ export const insertItemEstoqueSchema = createInsertSchema(itensEstoque).pick({
   valorUnitario: true,
   estoqueMinimo: true,
   estoqueIdeal: true,
+  codigoBarras: true,
 });
 
 // Schema para movimentações de estoque

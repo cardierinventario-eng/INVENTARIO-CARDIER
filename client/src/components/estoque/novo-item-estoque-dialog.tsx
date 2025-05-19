@@ -27,7 +27,8 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
-import { Plus } from "lucide-react";
+import { Plus, Barcode } from "lucide-react";
+import { DialogCodigoBarras } from "@/components/codigo-barras/dialog-codigo-barras";
 
 // Schema de validação
 const formSchema = z.object({
@@ -40,6 +41,7 @@ const formSchema = z.object({
   precoUnitario: z.string().min(1, "Preço unitário é obrigatório"),
   descricao: z.string().optional(),
   localArmazenamento: z.string().optional(),
+  codigoBarras: z.string().optional(),
 });
 
 type FormValues = z.infer<typeof formSchema>;
