@@ -55,6 +55,202 @@ export function ComprovanteImpressao({
   
   const isLoading = pedidoLoading || itensLoading;
   
+  // Função para imprimir na página atual (método alternativo)
+  const imprimirNaPaginaAtual = () => {
+    if (!pedido || !itensPedido) return;
+    
+    // Criar o conteúdo do comprovante
+    const content = gerarConteudoComprovante();
+    
+    // Criar elemento temporário para impressão
+    const printElement = document.createElement('div');
+    printElement.innerHTML = content;
+    printElement.style.display = 'none';
+    printElement.id = 'print-content';
+    
+    // Adicionar ao DOM
+    document.body.appendChild(printElement);
+    
+    // Criar CSS para impressão
+    const printStyle = document.createElement('style');
+    printStyle.innerHTML = `
+      @media print {
+        body * { visibility: hidden; }
+        #print-content, #print-content * { visibility: visible; }
+        #print-content { position: absolute; left: 0; top: 0; width: 100%; }
+        @page { size: 80mm 200mm; margin: 5mm; }
+      }
+    `;
+    document.head.appendChild(printStyle);
+    
+    // Imprimir
+    window.print();
+    
+    // Limpar após impressão
+    setTimeout(() => {
+      document.body.removeChild(printElement);
+      document.head.removeChild(printStyle);
+    }, 1000);
+  };
+
+  // Função para gerar conteúdo do comprovante
+  const gerarConteudoComprovante = () => {
+    if (!pedido || !itensPedido) return '';
+    
+    let titulo = "LANCHE FÁCIL";
+    let subtitulo = "";
+    let incluirPrecos = true;
+    let incluirObservacoes = true;
+    let incluirRodape = true;
+    let incluirTotais = true;
+    
+    switch (tipoComprovante) {
+      case "cozinha":
+        subtitulo = "COMANDA PARA COZINHA";
+        incluirPrecos = false;
+        incluirTotais = false;
+        break;
+      case "cliente":
+        subtitulo = "COMPROVANTE DE PEDIDO";
+        break;
+      case "conta":
+        subtitulo = "NOTA PARA FECHAMENTO";
+        incluirObservacoes = true;
+        break;
+    }
+    
+    const dataFormatada = pedido.dataCriacao ? 
+      new Date(pedido.dataCriacao).toLocaleString('pt-BR') : 
+      new Date().toLocaleString('pt-BR');
+    
+    const formaPagamentoTexto = 
+      pedido.formaPagamento === 'dinheiro' ? 'Dinheiro' :
+      pedido.formaPagamento === 'cartao_credito' ? 'Cartão de Crédito' :
+      pedido.formaPagamento === 'cartao_debito' ? 'Cartão de Débito' :
+      pedido.formaPagamento === 'pix' ? 'PIX' : 
+      pedido.formaPagamento || '-';
+    
+    let tipoTexto = 'Balcão';
+    if (pedido.tipo === 'mesa') {
+      tipoTexto = `Mesa ${mesa?.numero || mesaId || ''}`;
+    } else if (pedido.tipo === 'delivery') {
+      tipoTexto = 'Delivery';
+    }
+    
+    // Itens do pedido em HTML
+    let itensHtml = '';
+    if (Array.isArray(itensPedido)) {
+      itensPedido.forEach((item: any) => {
+        const precoUnitario = parseFloat(item.preco);
+        const precoTotal = precoUnitario * item.quantidade;
+        
+        if (tipoComprovante === "cozinha") {
+          itensHtml += `
+            <tr>
+              <td style="font-weight: bold">${item.quantidade}x</td>
+              <td style="font-weight: bold">${item.nome}</td>
+              ${item.observacoes ? `<td>${item.observacoes}</td>` : '<td></td>'}
+            </tr>
+          `;
+        } else {
+          itensHtml += `
+            <tr>
+              <td>${item.nome}</td>
+              <td style="text-align: center">${item.quantidade}</td>
+              <td style="text-align: right">R$ ${precoUnitario.toFixed(2)}</td>
+              <td style="text-align: right">R$ ${precoTotal.toFixed(2)}</td>
+            </tr>
+          `;
+        }
+      });
+    }
+    
+    return `
+      <div style="font-family: Arial, sans-serif; width: 70mm; margin: 0 auto;">
+        <div style="text-align: center; margin-bottom: 10px; border-bottom: 1px solid #ccc; padding-bottom: 5px;">
+          <div style="font-size: 18px; font-weight: bold; margin-bottom: 3px;">${titulo}</div>
+          <div style="font-size: 16px; margin-bottom: 3px;">${subtitulo}</div>
+        </div>
+        
+        ${tipoComprovante === "cozinha" ? `
+        <div style="text-align: center; margin: 10px 0; padding: 5px; border: 1px dashed #000;">
+          <div style="font-size: 18px; font-weight: bold;">PEDIDO PARA PREPARO</div>
+          <div style="font-size: 18px; font-weight: bold;">${tipoTexto}</div>
+        </div>
+        ` : ''}
+        
+        <div style="margin-bottom: 5px; font-size: 14px;">
+          <strong>Número:</strong> ${pedido.numero}
+        </div>
+        <div style="margin-bottom: 5px; font-size: 14px;">
+          <strong>Data/Hora:</strong> ${dataFormatada}
+        </div>
+        <div style="margin-bottom: 5px; font-size: 14px;">
+          <strong>Tipo:</strong> ${tipoTexto}
+        </div>
+        
+        ${pedido.nomeCliente ? `
+        <div style="margin-bottom: 5px; font-size: 14px;">
+          <strong>Cliente:</strong> ${pedido.nomeCliente}
+        </div>
+        ` : ''}
+        
+        ${incluirPrecos ? `
+        <div style="margin-bottom: 5px; font-size: 14px;">
+          <strong>Pagamento:</strong> ${formaPagamentoTexto}
+        </div>
+        ` : ''}
+        
+        <table style="width: 100%; border-collapse: collapse; margin: 8px 0; font-size: 13px;">
+          <thead>
+            <tr>
+              ${tipoComprovante === "cozinha" ? `
+                <th style="border-bottom: 1px solid #ddd; padding: 4px; text-align: left; font-weight: bold;">Qtd</th>
+                <th style="border-bottom: 1px solid #ddd; padding: 4px; text-align: left; font-weight: bold;">Item</th>
+                <th style="border-bottom: 1px solid #ddd; padding: 4px; text-align: left; font-weight: bold;">Observações</th>
+              ` : `
+                <th style="border-bottom: 1px solid #ddd; padding: 4px; text-align: left; font-weight: bold;">Item</th>
+                <th style="border-bottom: 1px solid #ddd; padding: 4px; text-align: center; font-weight: bold;">Qtd</th>
+                <th style="border-bottom: 1px solid #ddd; padding: 4px; text-align: right; font-weight: bold;">Preço</th>
+                <th style="border-bottom: 1px solid #ddd; padding: 4px; text-align: right; font-weight: bold;">Total</th>
+              `}
+            </tr>
+          </thead>
+          <tbody>
+            ${itensHtml}
+          </tbody>
+        </table>
+        
+        ${incluirTotais ? `
+        <div style="font-weight: bold; margin-top: 8px; margin-bottom: 8px; text-align: right; font-size: 16px;">
+          TOTAL: R$ ${
+            Array.isArray(itensPedido) ? 
+              itensPedido.reduce((total, item) => {
+                const preco = typeof item.preco === 'string' ? parseFloat(item.preco) : item.preco;
+                return total + (preco * item.quantidade);
+              }, 0).toFixed(2) : 
+              "0.00"
+          }
+        </div>
+        ` : ''}
+        
+        ${incluirObservacoes && pedido.observacoes ? `
+        <div style="margin-top: 8px; font-size: 13px;">
+          <div style="font-weight: bold; margin-bottom: 2px;">Observações:</div>
+          <div>${pedido.observacoes}</div>
+        </div>
+        ` : ''}
+        
+        ${incluirRodape ? `
+        <div style="margin-top: 10px; text-align: center; font-size: 13px; border-top: 1px solid #ccc; padding-top: 5px;">
+          Agradecemos pela preferência!<br>
+          LANCHE FÁCIL - Seu restaurante completo
+        </div>
+        ` : ''}
+      </div>
+    `;
+  };
+  
   // Função para imprimir comprovante selecionado
   const imprimirComprovante = () => {
     if (!pedido || itensPedido.length === 0) return;
@@ -82,12 +278,9 @@ export function ComprovanteImpressao({
         break;
     }
     
-    // Cria uma janela para impressão
-    const printWindow = window.open('', '_blank');
-    if (!printWindow) {
-      alert("Não foi possível abrir a janela de impressão. Verifique se os pop-ups estão permitidos.");
-      return;
-    }
+    // Usa método de impressão que funciona em dispositivos móveis
+    imprimirNaPaginaAtual();
+    return;
     
     // Estilo CSS do comprovante
     const style = `
