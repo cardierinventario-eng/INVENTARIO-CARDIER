@@ -170,53 +170,73 @@ export function ImpressaoSimples({
       <head>
         <title>Comprovante #${(pedido as any).numero}</title>
         <style>
-          @page { size: 80mm auto; margin: 5mm; }
+          @page { 
+            size: 58mm auto; 
+            margin: 2mm; 
+          }
+          @media print {
+            body { 
+              width: 54mm !important; 
+              margin: 0 !important; 
+              padding: 2mm !important;
+            }
+          }
           body { 
-            font-family: Arial, sans-serif; 
-            font-size: 12px;
+            font-family: 'Courier New', monospace; 
+            font-size: 10px;
+            line-height: 1.2;
             margin: 0; 
-            padding: 10px;
-            max-width: 70mm;
+            padding: 2mm;
+            width: 54mm;
+            color: #000;
           }
           .centro { text-align: center; }
           .negrito { font-weight: bold; }
-          .linha { border-bottom: 1px dashed #000; margin: 5px 0; }
-          .espacamento { margin: 10px 0; }
+          .linha { 
+            border-bottom: 1px dashed #000; 
+            margin: 3px 0; 
+            width: 100%;
+          }
+          .espacamento { margin: 5px 0; }
+          .pequeno { font-size: 8px; }
+          .medio { font-size: 10px; }
+          .grande { font-size: 12px; font-weight: bold; }
         </style>
       </head>
       <body>
-        <div class="centro negrito" style="font-size: 16px;">${titulo}</div>
-        <div class="centro" style="font-size: 14px;">${subtitulo}</div>
+        <div class="centro grande">${titulo}</div>
+        <div class="centro medio">${subtitulo}</div>
         <div class="linha"></div>
         
-        <div><strong>Pedido:</strong> ${(pedido as any).numero}</div>
-        <div><strong>Data/Hora:</strong> ${dataFormatada}</div>
-        <div><strong>Tipo:</strong> ${tipoTexto}</div>
-        ${(pedido as any).nomeCliente ? `<div><strong>Cliente:</strong> ${(pedido as any).nomeCliente}</div>` : ''}
-        ${incluirPrecos ? `<div><strong>Pagamento:</strong> ${formaPagamentoTexto}</div>` : ''}
+        <div class="pequeno">Pedido: ${(pedido as any).numero}</div>
+        <div class="pequeno">${dataFormatada}</div>
+        <div class="pequeno">Tipo: ${tipoTexto}</div>
+        ${(pedido as any).nomeCliente ? `<div class="pequeno">Cliente: ${(pedido as any).nomeCliente}</div>` : ''}
+        ${incluirPrecos ? `<div class="pequeno">Pagto: ${formaPagamentoTexto}</div>` : ''}
         
         <div class="linha"></div>
-        <div class="negrito">ITENS:</div>
-        <pre style="font-family: Arial; font-size: 12px; white-space: pre-wrap;">${itensTexto}</pre>
+        <div class="negrito pequeno">ITENS:</div>
+        <div class="pequeno" style="white-space: pre-line;">${itensTexto}</div>
         
         ${incluirTotais ? `
         <div class="linha"></div>
-        <div class="negrito" style="text-align: right; font-size: 14px;">
+        <div class="negrito medio centro">
           TOTAL: R$ ${valorTotal.toFixed(2)}
         </div>
         ` : ''}
         
         ${(pedido as any).observacoes ? `
         <div class="linha"></div>
-        <div><strong>Observações:</strong></div>
-        <div>${(pedido as any).observacoes}</div>
+        <div class="pequeno"><strong>Obs:</strong></div>
+        <div class="pequeno">${(pedido as any).observacoes}</div>
         ` : ''}
         
-        <div class="espacamento linha"></div>
-        <div class="centro" style="font-size: 11px;">
-          Agradecemos pela preferência!<br>
-          LANCHE FÁCIL - Seu restaurante completo
+        <div class="linha"></div>
+        <div class="centro pequeno">
+          Obrigado pela preferencia!<br>
+          LANCHE FACIL
         </div>
+        <div class="linha"></div>
       </body>
       </html>
     `;
