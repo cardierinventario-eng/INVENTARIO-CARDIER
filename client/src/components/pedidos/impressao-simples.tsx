@@ -124,21 +124,21 @@ export function ImpressaoSimples({
         break;
     }
 
-    const dataFormatada = pedido.dataCriacao ? 
-      new Date(pedido.dataCriacao).toLocaleString('pt-BR') : 
+    const dataFormatada = (pedido as any).dataCriacao ? 
+      new Date((pedido as any).dataCriacao).toLocaleString('pt-BR') : 
       new Date().toLocaleString('pt-BR');
     
     const formaPagamentoTexto = 
-      pedido.formaPagamento === 'dinheiro' ? 'Dinheiro' :
-      pedido.formaPagamento === 'cartao_credito' ? 'Cartão de Crédito' :
-      pedido.formaPagamento === 'cartao_debito' ? 'Cartão de Débito' :
-      pedido.formaPagamento === 'pix' ? 'PIX' : 
-      pedido.formaPagamento || '-';
+      (pedido as any).formaPagamento === 'dinheiro' ? 'Dinheiro' :
+      (pedido as any).formaPagamento === 'cartao_credito' ? 'Cartão de Crédito' :
+      (pedido as any).formaPagamento === 'cartao_debito' ? 'Cartão de Débito' :
+      (pedido as any).formaPagamento === 'pix' ? 'PIX' : 
+      (pedido as any).formaPagamento || '-';
     
     let tipoTexto = 'Balcão';
-    if (pedido.tipo === 'mesa') {
-      tipoTexto = `Mesa ${mesa?.numero || mesaId || ''}`;
-    } else if (pedido.tipo === 'delivery') {
+    if ((pedido as any).tipo === 'mesa') {
+      tipoTexto = `Mesa ${(mesa as any)?.numero || mesaId || ''}`;
+    } else if ((pedido as any).tipo === 'delivery') {
       tipoTexto = 'Delivery';
     }
 
@@ -168,7 +168,7 @@ export function ImpressaoSimples({
       <!DOCTYPE html>
       <html>
       <head>
-        <title>Comprovante #${pedido.numero}</title>
+        <title>Comprovante #${(pedido as any).numero}</title>
         <style>
           @page { size: 80mm auto; margin: 5mm; }
           body { 
@@ -189,10 +189,10 @@ export function ImpressaoSimples({
         <div class="centro" style="font-size: 14px;">${subtitulo}</div>
         <div class="linha"></div>
         
-        <div><strong>Pedido:</strong> ${pedido.numero}</div>
+        <div><strong>Pedido:</strong> ${(pedido as any).numero}</div>
         <div><strong>Data/Hora:</strong> ${dataFormatada}</div>
         <div><strong>Tipo:</strong> ${tipoTexto}</div>
-        ${pedido.nomeCliente ? `<div><strong>Cliente:</strong> ${pedido.nomeCliente}</div>` : ''}
+        ${(pedido as any).nomeCliente ? `<div><strong>Cliente:</strong> ${(pedido as any).nomeCliente}</div>` : ''}
         ${incluirPrecos ? `<div><strong>Pagamento:</strong> ${formaPagamentoTexto}</div>` : ''}
         
         <div class="linha"></div>
@@ -206,10 +206,10 @@ export function ImpressaoSimples({
         </div>
         ` : ''}
         
-        ${pedido.observacoes ? `
+        ${(pedido as any).observacoes ? `
         <div class="linha"></div>
         <div><strong>Observações:</strong></div>
-        <div>${pedido.observacoes}</div>
+        <div>${(pedido as any).observacoes}</div>
         ` : ''}
         
         <div class="espacamento linha"></div>

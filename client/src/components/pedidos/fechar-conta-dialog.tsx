@@ -210,14 +210,9 @@ export function FecharContaDialog({
                   </div>
                   
                   <div className="flex justify-center mt-4">
-                    <ComprovanteImpressao 
+                    <ImpressaoSimples 
                       pedidoId={pedidoId} 
                       mesaId={mesaId}
-                      tiposDisponiveis={{ 
-                        cozinha: false, 
-                        cliente: false,
-                        conta: true 
-                      }}
                       trigger={
                         <Button variant="outline" className="mr-2">
                           <Printer className="mr-2 h-4 w-4" />
