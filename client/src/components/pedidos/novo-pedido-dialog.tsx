@@ -103,8 +103,33 @@ export function NovoPedidoDialog({
     queryKey: ['/api/cardapio'],
   });
   
+  // Buscar itens do estoque
+  const { data: estoqueData = [] } = useQuery({
+    queryKey: ['/api/estoque'],
+  });
+  
   // Type-safe array of itens cardápio
   const itensCardapio = cardapioData as any[];
+  
+  // Type-safe array of itens estoque
+  const itensEstoque = estoqueData as any[];
+  
+  // Combinar itens do cardápio e estoque para exibição
+  const todosOsItens = [
+    ...itensCardapio.map((item: any) => ({
+      ...item,
+      origem: 'cardapio',
+      preco: parseFloat(item.preco || 0)
+    })),
+    ...itensEstoque.map((item: any) => ({
+      ...item,
+      origem: 'estoque',
+      preco: parseFloat(item.valorUnitario || 0),
+      // Mapear campos do estoque para compatibilidade
+      descricao: item.descricao || '',
+      categoria: item.categoria || 'Geral'
+    }))
+  ];
 
   // Buscar mesas disponíveis
   const { data: mesasData = [] } = useQuery({
@@ -605,23 +630,48 @@ export function NovoPedidoDialog({
             <div className="grid grid-cols-1 md:grid-cols-12 gap-4">
               {/* Seletor de itens */}
               <div className="md:col-span-5 border rounded-md p-4 h-[300px] overflow-y-auto">
-                <h3 className="font-semibold mb-2">Itens do Cardápio</h3>
+                <h3 className="font-semibold mb-2">Itens Disponíveis</h3>
                 <div className="space-y-2">
-                  {itensCardapio.filter((item: any) => item.disponivel).map((item: any) => (
-                    <div key={item.id} className="flex justify-between items-center border-b pb-2">
-                      <div>
-                        <p className="font-medium">{item.nome}</p>
-                        <p className="text-sm text-muted-foreground">R$ {typeof item.preco === 'number' ? item.preco.toFixed(2) : item.preco}</p>
-                      </div>
-                      <Button 
-                        variant="ghost" 
-                        size="sm" 
-                        onClick={() => adicionarItem(item)}
-                      >
-                        <Plus className="h-4 w-4" />
-                      </Button>
+                  {todosOsItens.length === 0 ? (
+                    <div className="text-center text-muted-foreground py-4">
+                      <p>Nenhum item disponível.</p>
+                      <p className="text-sm">Adicione itens ao cardápio ou estoque.</p>
                     </div>
-                  ))}
+                  ) : (
+                    todosOsItens.map((item: any) => (
+                      <div key={`${item.origem}-${item.id}`} className="flex justify-between items-center border-b pb-2">
+                        <div>
+                          <div className="flex items-center gap-2">
+                            <p className="font-medium">{item.nome}</p>
+                            <span className={`text-xs px-2 py-1 rounded-full ${
+                              item.origem === 'cardapio' 
+                                ? 'bg-blue-100 text-blue-700' 
+                                : 'bg-green-100 text-green-700'
+                            }`}>
+                              {item.origem === 'cardapio' ? 'Cardápio' : 'Estoque'}
+                            </span>
+                          </div>
+                          <p className="text-sm text-muted-foreground">
+                            R$ {item.preco.toFixed(2)}
+                            {item.origem === 'estoque' && item.quantidade && (
+                              <span className="ml-2">({item.quantidade} {item.unidade || 'un'} disponível)</span>
+                            )}
+                          </p>
+                          {item.descricao && (
+                            <p className="text-xs text-muted-foreground">{item.descricao}</p>
+                          )}
+                        </div>
+                        <Button 
+                          variant="ghost" 
+                          size="sm" 
+                          onClick={() => adicionarItem(item)}
+                          disabled={item.origem === 'estoque' && parseFloat(item.quantidade || 0) <= 0}
+                        >
+                          <Plus className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    ))
+                  )}
                 </div>
               </div>
               
