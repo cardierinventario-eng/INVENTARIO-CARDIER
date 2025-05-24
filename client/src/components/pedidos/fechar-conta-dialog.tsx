@@ -12,7 +12,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { ComprovanteImpressao } from "./comprovante-impressao";
+import { ImpressaoSimples } from "./impressao-simples";
 import {
   CreditCard,
   Receipt,

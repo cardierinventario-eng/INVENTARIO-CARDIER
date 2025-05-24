@@ -29,7 +29,7 @@ import { Eye, Plus, Search, FileDown, Printer, Edit2, Trash2, CreditCard } from 
 import { PrintButton } from "@/components/shared/print-button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { type Pedido } from "@shared/schema";
-import { ComprovanteImpressao } from "@/components/pedidos/comprovante-impressao";
+import { ImpressaoSimples } from "@/components/pedidos/impressao-simples";
 import { FecharContaDialog } from "@/components/pedidos/fechar-conta-dialog";
 
 export default function Pedidos() {
@@ -193,7 +193,7 @@ export default function Pedidos() {
                               <Eye className="h-4 w-4" />
                             </Button>
                             
-                            <ComprovanteImpressao 
+                            <ImpressaoSimples 
                               pedidoId={pedido.id}
                               mesaId={pedido.mesaId || undefined}
                               trigger={
