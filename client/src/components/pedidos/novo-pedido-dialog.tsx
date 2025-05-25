@@ -94,6 +94,7 @@ export function NovoPedidoDialog({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [itensSelecionados, setItensSelecionados] = useState<ItemPedido[]>([]);
   const [pedidoCriado, setPedidoCriado] = useState<any>(null);
+  const [incluirTaxaServico, setIncluirTaxaServico] = useState(true); // Taxa de 10% padrão para mesas
   
   const queryClient = useQueryClient();
   const { toast } = useToast();
@@ -251,11 +252,20 @@ export function NovoPedidoDialog({
     );
   };
 
-  // Calcular valor total do pedido
-  const valorTotal = itensSelecionados.reduce((total, item) => {
+  // Calcular subtotal dos itens
+  const subtotalItens = itensSelecionados.reduce((total, item) => {
     const preco = typeof item.preco === 'string' ? parseFloat(item.preco) : item.preco;
     return total + (preco * item.quantidade);
   }, 0);
+
+  // Calcular taxa de serviço (10% para pedidos de mesa)
+  const tipoSelecionado = form.watch("tipo");
+  const taxaServico = (tipoSelecionado === "mesa" && incluirTaxaServico) 
+    ? subtotalItens * 0.10 
+    : 0;
+
+  // Valor total final
+  const valorTotal = subtotalItens + taxaServico;
 
   // Imprimir pedido
   const imprimirPedido = () => {
