@@ -220,6 +220,11 @@ export function ImpressaoSimples({
         
         ${incluirTotais ? `
         <div class="linha"></div>
+        ${(pedido as any).taxaServico && parseFloat((pedido as any).taxaServico) > 0 ? `
+        <div class="pequeno">Subtotal: R$ ${(valorTotal - parseFloat((pedido as any).taxaServico || 0)).toFixed(2)}</div>
+        <div class="pequeno">Taxa servico (10%): R$ ${parseFloat((pedido as any).taxaServico || 0).toFixed(2)}</div>
+        <div class="linha"></div>
+        ` : ''}
         <div class="negrito medio centro">
           TOTAL: R$ ${valorTotal.toFixed(2)}
         </div>

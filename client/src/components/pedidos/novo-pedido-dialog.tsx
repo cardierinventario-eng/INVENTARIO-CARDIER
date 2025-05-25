@@ -514,6 +514,7 @@ export function NovoPedidoDialog({
         numero: Math.floor(Math.random() * 10000), // Número aleatório para o pedido
         data: new Date(),
         valorTotal: valorTotal.toString(),
+        taxaServico: taxaServico.toString(),
         status: "pendente",
       };
 
@@ -749,7 +750,38 @@ export function NovoPedidoDialog({
                   )}
                 </div>
                 <Separator className="my-2" />
-                <div className="flex justify-between font-semibold">
+                
+                {/* Mostrar detalhamento quando for pedido de mesa */}
+                {tipoSelecionado === "mesa" && (
+                  <div className="space-y-2 text-sm">
+                    <div className="flex justify-between">
+                      <span>Subtotal:</span>
+                      <span>R$ {subtotalItens.toFixed(2)}</span>
+                    </div>
+                    
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center space-x-2">
+                        <input
+                          type="checkbox"
+                          id="taxaServico"
+                          checked={incluirTaxaServico}
+                          onChange={(e) => setIncluirTaxaServico(e.target.checked)}
+                          className="rounded border-gray-300"
+                        />
+                        <label htmlFor="taxaServico" className="text-sm cursor-pointer">
+                          Taxa de serviço (10%)
+                        </label>
+                      </div>
+                      <span className={incluirTaxaServico ? "text-green-600" : "text-gray-400"}>
+                        R$ {taxaServico.toFixed(2)}
+                      </span>
+                    </div>
+                    
+                    <Separator />
+                  </div>
+                )}
+                
+                <div className="flex justify-between font-semibold text-lg">
                   <span>Total:</span>
                   <span>R$ {valorTotal.toFixed(2)}</span>
                 </div>
