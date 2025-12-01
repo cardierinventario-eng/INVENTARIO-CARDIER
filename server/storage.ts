@@ -889,5 +889,7 @@ export class MemStorage implements IStorage {
 // Importar a implementação de banco de dados
 import { DatabaseStorage } from './database-storage';
 
-// Para uso em produção e funcionamento 24/7, use o armazenamento de banco de dados
-export const storage = new DatabaseStorage();
+// TEMPORÁRIO: Usando armazenamento em memória até que o banco de dados seja reativado
+// Para reativar o banco de dados PostgreSQL, acesse a aba 'Database' no Replit
+// e depois altere a linha abaixo para: export const storage = new DatabaseStorage();
+export const storage = new MemStorage();
