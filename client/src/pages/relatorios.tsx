@@ -236,7 +236,7 @@ export default function Relatorios() {
                       </tr>
                     </thead>
                     <tbody>
-                      {relatorioVendas.produtosMaisVendidos.map((produto, index) => (
+                      {relatorioVendas.produtosMaisVendidos.map((produto: {produto: string; quantidade: number; total: number}, index: number) => (
                         <tr key={index} className="border-b">
                           <td className="py-2">{produto.produto}</td>
                           <td className="text-right py-2">{produto.quantidade}</td>

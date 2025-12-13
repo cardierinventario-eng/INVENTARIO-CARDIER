@@ -1,0 +1,13 @@
+[build]
+command = "npm run build"
+publish = "dist/public"
+
+# Rewrite all routes to index.html for SPA routing
+[[redirects]]
+from = "/*"
+to = "/index.html"
+status = 200
+
+# Note: Backend should be deployed separately on Render/Railway
+# Frontend will connect to backend via environment variable
+# Set in Netlify: VITE_API_URL=https://seu-backend.render.com

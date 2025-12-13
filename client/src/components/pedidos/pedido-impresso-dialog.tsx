@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
+import { type Pedido, type ItemPedido } from "@shared/schema";
 import { 
   Dialog,
   DialogContent,
@@ -34,13 +35,13 @@ export function PedidoImpressoDialog({
   }, [isOpen]);
 
   // Buscar dados do pedido
-  const { data: pedido, isLoading: pedidoLoading } = useQuery({
+  const { data: pedido, isLoading: pedidoLoading } = useQuery<Pedido>({
     queryKey: ['/api/pedidos', pedidoId],
     enabled: !!pedidoId && isOpen,
   });
 
   // Buscar itens do pedido
-  const { data: itensPedido = [], isLoading: itensLoading } = useQuery({
+  const { data: itensPedido = [], isLoading: itensLoading } = useQuery<ItemPedido[]>({
     queryKey: ['/api/pedidos/itens', pedidoId],
     enabled: !!pedidoId && isOpen,
   });

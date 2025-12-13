@@ -1,0 +1,120 @@
+🚀 DEPLOY VERCEL - PASSO A PASSO
+
+========================================
+VERCEL (RECOMENDADO - SUPER FÁCIL!)
+========================================
+
+✅ Gratuito
+✅ Sem GitHub necessário
+✅ Hospeda Frontend + Backend
+✅ Deploy em 2 minutos
+✅ Auto-redeploy ao carregar arquivos
+
+========================================
+PASSO 1: CRIAR CONTA VERCEL
+========================================
+
+1. Acesse: https://vercel.com/signup
+
+2. Escolha uma opção:
+   ✓ Sign up with GitHub
+   ✓ Sign up with GitLab
+   ✓ Sign up with Bitbucket
+   ✓ Continue with Email
+
+3. Confirme email
+
+✅ Conta criada!
+
+========================================
+PASSO 2: IMPORTAR PROJETO
+========================================
+
+1. Após login, clique em "Add New..."
+
+2. Selecione "Project"
+
+3. Escolha uma opção:
+
+   OPÇÃO A: "Import Git Repository"
+   - Cole a URL do GitHub (se tiver)
+   - Ou deixe vazio
+
+   OPÇÃO B: "Clone Template"
+   - Procure por Node.js
+   - Clone um template básico
+
+========================================
+PASSO 3: UPLOAD DA PASTA (Mais Fácil!)
+========================================
+
+1. Na dashboard do Vercel, vá em "Settings"
+
+2. Role até "Git Integration"
+
+3. OU use a linha de comando:
+
+   npm i -g vercel
+   vercel
+
+4. Na primeira vez, autorize com email/GitHub
+
+5. Escolha:
+   ? Set up and deploy? Yes
+   ? Which scope? Seu nome/conta
+   ? Project name? lanchefacil
+   ? Detected existing vercel.json? Yes
+
+6. Pronto! Deploy automático!
+
+========================================
+PASSO 4: PRONTO!
+========================================
+
+Você receberá uma URL:
+https://lanchefacil.vercel.app
+
+Seu app está ONLINE! 🎉
+
+========================================
+VERIFICAR DEPLOY
+========================================
+
+1. Abra: https://lanchefacil.vercel.app
+2. Vá para "Estoque"
+3. Clique "Novo Item"
+4. Crie um produto
+5. Funciona? ✅ Sucesso!
+
+========================================
+PRÓXIMAS ATUALIZAÇÕES
+========================================
+
+Sempre que atualizar localmente:
+
+1. npm run build
+
+2. vercel --prod
+
+E pronto! Novo deploy! 🚀
+
+Ou use GitHub + auto-deploy
+
+========================================
+ALTERNATIVA: GitHub + Vercel
+========================================
+
+Se tiver GitHub:
+
+1. Push para GitHub:
+   git push origin main
+
+2. No Vercel:
+   - "Add New" → "Project"
+   - "Import Git Repository"
+   - Selecione seu repositório
+   - Deploy automático!
+
+3. Sempre que fazer push, Vercel faz deploy!
+
+========================================

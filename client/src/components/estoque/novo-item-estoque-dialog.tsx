@@ -83,11 +83,11 @@ export function NovoItemEstoqueDialog() {
         nome: data.nome,
         categoria: data.categoria,
         descricao: data.descricao || "",
-        quantidade: data.quantidade.toString(),
+        quantidade: Number(data.quantidade),
         unidade: data.unidade,
-        valorUnitario: data.precoUnitario.replace(",", "."),
-        estoqueMinimo: data.estoqueMinimo.toString(),
-        estoqueIdeal: data.estoqueIdeal.toString(),
+        valorUnitario: parseFloat(String(data.precoUnitario).replace(",", ".")) || 0,
+        estoqueMinimo: Number(data.estoqueMinimo),
+        estoqueIdeal: Number(data.estoqueIdeal),
         codigoBarras: data.codigoBarras || ""
       };
       
@@ -128,7 +128,7 @@ export function NovoItemEstoqueDialog() {
           <Plus className="mr-2 h-4 w-4" /> Novo Item
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[550px]">
+      <DialogContent className="sm:max-w-[550px] max-h-[80vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Adicionar Novo Item ao Estoque</DialogTitle>
           <DialogDescription>
@@ -299,7 +299,7 @@ export function NovoItemEstoqueDialog() {
                   <FormControl>
                     <Textarea 
                       placeholder="Descreva detalhes adicionais sobre o item" 
-                      className="resize-none" 
+                      className="h-24 resize-none overflow-y-auto" 
                       {...field} 
                     />
                   </FormControl>

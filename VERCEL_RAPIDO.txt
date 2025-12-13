@@ -1,0 +1,48 @@
+🚀 VERCEL DEPLOY - RESUMO RÁPIDO
+
+========================================
+SEM GITHUB - 3 MINUTOS
+========================================
+
+1. vercel.com/signup
+
+2. Confirme email
+
+3. Click "Add New..." → "Project"
+
+4. Use CLI (mais fácil):
+   npm i -g vercel
+   vercel
+
+5. Responda as perguntas:
+   ? Set up and deploy? Yes
+   ? Scope? [Seu nome]
+   ? Project name? lanchefacil
+   ? Detected vercel.json? Yes
+
+6. Aguarde 2 minutos
+
+7. Você recebe URL:
+   https://lanchefacil.vercel.app
+
+✅ APP ONLINE!
+
+========================================
+TESTE
+========================================
+
+1. Abra seu link
+2. Crie um produto
+3. Funciona? ✅ Pronto!
+
+========================================
+PRÓXIMAS VEZES
+========================================
+
+Para atualizar:
+
+vercel --prod
+
+Novo deploy em 1 minuto!
+
+========================================

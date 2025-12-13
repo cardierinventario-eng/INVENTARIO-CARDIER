@@ -1,0 +1,164 @@
+🚀 DEPLOY NETLIFY + RENDER - GUIA FINAL
+
+========================================
+ESCOLHA BASEADA NO SEU CASO
+========================================
+
+├─ OPÇÃO A: RENDER FRONTEND + BACKEND ⭐⭐⭐⭐⭐
+│  (RECOMENDADO - Mais simples)
+│  ✅ Tudo em um lugar
+│  ✅ Deploy automático
+│  ✅ Gratuito
+│
+├─ OPÇÃO B: NETLIFY FRONTEND + RENDER BACKEND ⭐⭐⭐⭐
+│  (Se quer usar Netlify)
+│  ✅ Frontend no Netlify
+│  ✅ Backend no Render
+│  ✅ Funciona perfeitamente
+│
+└─ OPÇÃO C: Só Netlify (não recomendado)
+   ❌ Não suporta Express no plano gratuito
+
+
+========================================
+OPÇÃO A: RENDER (RECOMENDADO)
+========================================
+
+1️⃣ GitHub
+────────
+cd "c:\Users\User\OneDrive\Desktop\LancheFacil"
+git add .
+git commit -m "LancheFácil - Pronto para Deploy"
+git push origin main
+
+2️⃣ Render.com
+─────────────
+1. Acesse render.com
+2. Login com GitHub
+3. "New" → "Web Service"
+4. Selecione: lanchefacil
+5. Build: npm install && npm run build
+6. Start: npm start
+7. Clique "Deploy"
+8. Aguarde 3 minutos
+
+✅ App online em: https://seu-app.render.com
+
+========================================
+OPÇÃO B: NETLIFY + RENDER
+========================================
+
+PASSO 1: Deploy Backend (Render)
+────────────────────────────────
+1. render.com → "New" → "Web Service"
+2. Repositório: lanchefacil
+3. Build: npm install && npm run build
+4. Start: npm start
+5. Deploy!
+6. Copie a URL: https://seu-backend.render.com
+
+PASSO 2: Deploy Frontend (Netlify)
+───────────────────────────────────
+1. netlify.com → "Add new site" → "Import existing"
+2. GitHub → lanchefacil
+3. Build command: npm run build
+4. Publish directory: dist/public
+5. Clique "Deploy site"
+
+PASSO 3: Configurar URL da API
+───────────────────────────────
+No Netlify Dashboard:
+1. Seu site → Site settings
+2. Build & deploy → Environment
+3. Clique "Edit variables"
+4. Adicione:
+   VITE_API_URL = https://seu-backend.render.com
+5. Salve
+
+PASSO 4: Redeploy
+──────────────────
+Seu site vai recompilar com a nova URL!
+
+========================================
+ESTRUTURA PÓS-DEPLOY
+========================================
+
+Frontend (Netlify)
+├─ URL: https://seu-site.netlify.app
+├─ Páginas: Inventário, Estoque, etc
+└─ Conecta ao backend via VITE_API_URL
+
+Backend (Render)
+├─ URL: https://seu-app.render.com
+├─ APIs: /api/itens, /api/movimentacoes, etc
+└─ Database: SQLite local
+
+========================================
+TESTANDO APÓS DEPLOY
+========================================
+
+1. Abra: https://seu-site.netlify.app
+2. Vá para "Estoque"
+3. Clique "Novo Item"
+4. Preencha e clique "Criar"
+5. Se funcionou, está tudo certo! ✅
+
+Se tiver erro na criação:
+- Verifique se VITE_API_URL está correto
+- Verifique os logs do Render
+- Tente redeploy no Netlify
+
+========================================
+MINHA RECOMENDAÇÃO FINAL
+========================================
+
+┌─────────────────────────────────────┐
+│  USE RENDER PARA TUDO (OPÇÃO A)    │
+│                                     │
+│  ✅ Mais simples (5 minutos)       │
+│  ✅ Uma plataforma só             │
+│  ✅ Menos problemas               │
+│  ✅ Deploy automático             │
+│                                     │
+│  render.com → New Web Service      │
+│  GitHub → Deploy!                  │
+└─────────────────────────────────────┘
+
+========================================
+URLS FINAIS (Render)
+========================================
+
+Frontend: https://seu-app.render.com
+Backend: https://seu-app.render.com/api/*
+Tudo servido no mesmo domínio! 🎉
+
+========================================
+PROBLEMAS COMUNS
+========================================
+
+❌ "Cannot GET /api/..."
+   → Verifique VITE_API_URL no Netlify
+   → Ou use Render que funciona do jeito
+
+❌ "Failed to fetch"
+   → CORS ou API não está respondendo
+   → Verifique logs do Render
+
+❌ "Frontend não conecta ao backend"
+   → Confirme que VITE_API_URL está certo
+   → Redeploy o Netlify
+
+========================================
+DEPLOY RÁPIDO - TL;DR
+========================================
+
+Render (Recomendado):
+render.com → GitHub → Deploy ✅
+
+Netlify + Render:
+1. Render backend
+2. Netlify frontend  
+3. Set VITE_API_URL
+4. Redeploy Netlify ✅
+
+========================================

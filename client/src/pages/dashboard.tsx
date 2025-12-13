@@ -10,20 +10,16 @@ import { useToast } from "@/hooks/use-toast";
 import { AlertTriangle } from "lucide-react";
 
 interface DashboardStats {
-  pedidosHoje: number;
-  vendasHoje: number;
-  mesasOcupadas: number;
-  totalMesas: number;
+  totalItens: number;
+  totalGrupos: number;
   itensEstoqueBaixo: number;
-  crescimentoPedidos: string;
-  crescimentoVendas: string;
-  ocupacaoMesas: string;
+  valorTotalEstoque: number;
 }
 
 export default function Dashboard() {
   const { toast } = useToast();
   const { data: stats, isLoading } = useQuery<DashboardStats>({
-    queryKey: ['/api/dashboard/stats'],
+    queryKey: ['/api/stats'],
   });
   
   // Efeito para mostrar alerta quando houver itens com estoque baixo
@@ -40,8 +36,8 @@ export default function Dashboard() {
   return (
     <>
       <div className="mb-6">
-        <h1 className="text-2xl font-heading font-bold text-neutral-darkest">Dashboard</h1>
-        <p className="text-neutral-dark">Bem-vindo ao sistema de gerenciamento Lanche Fácil</p>
+        <h1 className="text-2xl font-heading font-bold text-neutral-darkest">Dashboard de Inventário</h1>
+        <p className="text-neutral-dark">Visão geral do seu sistema de estoque</p>
       </div>
       
       {/* Stats Row */}
@@ -63,42 +59,30 @@ export default function Dashboard() {
         ) : stats ? (
           <>
             <StatCard
-              title="Pedidos Hoje"
-              value={stats.pedidosHoje}
-              icon="fa-shopping-bag"
+              title="Total de Itens"
+              value={stats.totalItens}
+              icon="fa-boxes"
               color="primary"
-              trend={{
-                value: stats.crescimentoPedidos,
-                positive: !stats.crescimentoPedidos.includes("-")
-              }}
             />
             
             <StatCard
-              title="Vendas de Hoje"
-              value={`R$ ${stats.vendasHoje.toFixed(2).replace('.', ',')}`}
-              icon="fa-dollar-sign"
+              title="Grupos"
+              value={stats.totalGrupos}
+              icon="fa-folder"
               color="secondary"
-              trend={{
-                value: stats.crescimentoVendas,
-                positive: !stats.crescimentoVendas.includes("-")
-              }}
             />
             
             <StatCard
-              title="Mesas Ocupadas"
-              value={`${stats.mesasOcupadas}/${stats.totalMesas}`}
-              icon="fa-utensils"
+              title="Valor Total Estoque"
+              value={`R$ ${stats.valorTotalEstoque.toFixed(2).replace('.', ',')}`}
+              icon="fa-dollar-sign"
               color="warning"
-              trend={{
-                value: stats.ocupacaoMesas,
-                positive: true
-              }}
             />
             
             <StatCard
               title="Itens com Estoque Baixo"
               value={stats.itensEstoqueBaixo}
-              icon="fa-boxes"
+              icon="fa-alert-triangle"
               color="danger"
               trend={stats.itensEstoqueBaixo > 0 ? {
                 value: "Atenção necessária",

@@ -111,18 +111,16 @@ export function AdicionarProdutosMesaDialog({
     if (!item) return;
 
     // Adicionar item à lista
-    setItensSelecionados(prev => [
+      setItensSelecionados(prev => [
       ...prev, 
       {
         itemCardapioId: item.id,
         nome: item.nome,
-        preco: item.preco,
+        preco: String(item.preco),
         quantidade,
         observacoes: observacoes || undefined
       }
-    ]);
-
-    // Limpar os campos após adicionar
+    ]);    // Limpar os campos após adicionar
     setItemSelecionadoId(0);
     setQuantidade(1);
     setObservacoes("");
@@ -263,8 +261,8 @@ export function AdicionarProdutosMesaDialog({
                 </SelectTrigger>
                 <SelectContent>
                   {itensDisponiveis.map((item) => (
-                    <SelectItem key={item.id} value={item.id.toString()}>
-                      {item.nome} - {formatCurrency(parseFloat(item.preco))}
+                      <SelectItem key={item.id} value={item.id.toString()}>
+                      {item.nome} - {formatCurrency(Number(item.preco))}
                     </SelectItem>
                   ))}
                 </SelectContent>

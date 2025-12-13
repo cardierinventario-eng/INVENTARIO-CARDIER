@@ -81,7 +81,7 @@ export function AjustarEstoqueDialog({ item, children }: AjustarEstoqueDialogPro
       await apiRequest(`/api/estoque/movimentacao`, "POST", {
         itemId: item.id,
         tipo: tipoMovimentacao,
-        quantidade: quantidade.toString(),
+        quantidade: Number(quantidade),
         usuarioId: 1,
         motivo: observacoes || `Ajuste manual de estoque: ${tipoMovimentacao}`,
         produto: item.nome

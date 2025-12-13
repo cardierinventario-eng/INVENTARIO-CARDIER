@@ -2,18 +2,12 @@ import { Link, useLocation } from "wouter";
 import { cn } from "@/lib/utils";
 
 const menuItems = [
-  { title: "Principal", type: "header" },
-  { title: "Dashboard", icon: "fa-tachometer-alt", href: "/" },
-  { title: "Pedidos", icon: "fa-receipt", href: "/pedidos" },
-  { title: "Mesas", icon: "fa-utensils", href: "/mesas" },
-  { title: "Estoque", icon: "fa-boxes", href: "/estoque" },
-  { title: "Clientes", icon: "fa-users", href: "/clientes" },
-  { title: "Cardápio", icon: "fa-hamburger", href: "/cardapio" },
-
-  { title: "Relatórios", type: "header" },
-  { title: "Vendas", icon: "fa-chart-line", href: "/relatorios?tipo=vendas" },
-  { title: "Financeiro", icon: "fa-dollar-sign", href: "/relatorios?tipo=financeiro" },
-  { title: "Estoque", icon: "fa-cubes", href: "/relatorios?tipo=estoque" },
+  { title: "Inventário", type: "header" },
+  { title: "Inventário", icon: "fa-boxes", href: "/" },
+  { title: "Estoque", icon: "fa-warehouse", href: "/estoque" },
+  { title: "Grupos", icon: "fa-folder", href: "/grupos" },
+  { title: "Movimentações", icon: "fa-arrows-alt", href: "/movimentacoes" },
+  { title: "Fornecedores", icon: "fa-truck", href: "/fornecedores" },
 
   { title: "Sistema", type: "header" },
   { title: "Configurações", icon: "fa-cog", href: "/configuracoes" },
@@ -27,9 +21,9 @@ export default function Sidebar() {
     <aside className="bg-primary w-64 flex-shrink-0 hidden md:block h-full overflow-y-auto shadow-lg">
       <div className="p-4 flex items-center border-b border-primary-dark">
         <div className="w-10 h-10 rounded-md mr-3 bg-white/20 flex items-center justify-center text-white">
-          <i className="fas fa-utensils text-xl"></i>
+          <i className="fas fa-boxes text-xl"></i>
         </div>
-        <h1 className="text-white font-heading font-bold text-xl">Lanche Fácil</h1>
+        <h1 className="text-white font-heading font-bold text-xl">Inventário</h1>
       </div>
       
       <nav className="mt-5">
@@ -48,14 +42,14 @@ export default function Sidebar() {
           let isActive = false;
           if (item.href === "/" && location === "/") {
             isActive = true;
-          } else if (item.href !== "/" && location.startsWith(item.href)) {
+          } else if (item.href !== "/" && location.startsWith(item.href ?? '')) {
             isActive = true;
           }
           
           return (
             <Link 
               key={index} 
-              href={item.href}
+              href={item.href ?? '/'}
               className={cn(
                 "flex items-center py-3 px-4 text-white",
                 isActive 

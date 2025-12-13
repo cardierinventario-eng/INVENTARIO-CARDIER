@@ -1,0 +1,25 @@
+{
+  "build": {
+    "command": "npm run build",
+    "functions": "netlify/functions",
+    "publish": "dist/client"
+  },
+  "functions": {
+    "api": {
+      "included_files": ["dist/**"],
+      "external_node_modules": ["better-sqlite3"]
+    }
+  },
+  "redirects": [
+    {
+      "from": "/api/*",
+      "to": "/.netlify/functions/api/:splat",
+      "status": 200
+    },
+    {
+      "from": "/*",
+      "to": "/index.html",
+      "status": 200
+    }
+  ]
+}

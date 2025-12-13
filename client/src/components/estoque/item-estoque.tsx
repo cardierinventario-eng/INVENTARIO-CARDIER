@@ -89,7 +89,11 @@ export function ItemEstoque({ item }: ItemEstoqueProps) {
         </div>
         <div className="flex items-center space-x-1">
           <EditarItemEstoqueDialog item={item} />
-          <ExcluirItemEstoqueDialog item={item} />
+          <ExcluirItemEstoqueDialog item={item}>
+            <Button variant="ghost" size="icon" className="text-destructive h-8 w-8">
+              <Trash2 className="h-4 w-4" />
+            </Button>
+          </ExcluirItemEstoqueDialog>
         </div>
       </CardFooter>
     </Card>

@@ -108,8 +108,7 @@ export function LeitorCodigoBarras({
             qrbox: {
               width: Math.min(dimensions.width - 50, qrConfig.qrbox.width),
               height: Math.min(dimensions.height - 50, qrConfig.qrbox.height)
-            },
-            experimentalFeatures: qrConfig.experimentalFeatures
+            }
           },
           (decodedText) => {
             // Processamento de sucesso

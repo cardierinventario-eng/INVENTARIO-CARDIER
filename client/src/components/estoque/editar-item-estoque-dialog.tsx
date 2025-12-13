@@ -2,10 +2,10 @@ import { useState, useEffect } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { type ItemEstoque } from "@shared/schema";
+import { editEstoqueFormSchema, type EditEstoqueFormValues } from "@/lib/schemas";
 
 import {
   Dialog,
@@ -29,20 +29,6 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Edit } from "lucide-react";
 
-// Schema de validação para o formulário
-const formSchema = z.object({
-  nome: z.string().min(3, { message: "Nome deve ter no mínimo 3 caracteres" }),
-  categoria: z.string().min(1, { message: "Categoria é obrigatória" }),
-  descricao: z.string().optional(),
-  quantidade: z.string().or(z.number()).transform(val => val.toString()),
-  unidade: z.string().min(1, { message: "Unidade é obrigatória" }),
-  valorUnitario: z.string().min(1, { message: "Valor unitário é obrigatório" }),
-  estoqueMinimo: z.string().or(z.number()).transform(val => val.toString()),
-  estoqueIdeal: z.string().or(z.number()).transform(val => val.toString()),
-});
-
-type FormValues = z.infer<typeof formSchema>;
-
 interface EditarItemEstoqueDialogProps {
   item: ItemEstoque;
   children?: React.ReactNode;
@@ -54,17 +40,17 @@ export function EditarItemEstoqueDialog({ item, children }: EditarItemEstoqueDia
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
-  const form = useForm<FormValues>({
-    resolver: zodResolver(formSchema),
+  const form = useForm<EditEstoqueFormValues>({
+    resolver: zodResolver(editEstoqueFormSchema),
     defaultValues: {
-      nome: item.nome,
-      categoria: item.categoria,
+      nome: item.nome || "",
+      categoria: item.categoria || "",
       descricao: item.descricao || "",
-      quantidade: item.quantidade,
-      unidade: item.unidade,
-      valorUnitario: item.valorUnitario,
-      estoqueMinimo: item.estoqueMinimo,
-      estoqueIdeal: item.estoqueIdeal
+      quantidade: item.quantidade || 0,
+      unidade: item.unidade || "",
+      valorUnitario: item.valorUnitario || 0,
+      estoqueMinimo: item.estoqueMinimo || 0,
+      estoqueIdeal: item.estoqueIdeal || 0
     },
   });
 
@@ -72,19 +58,19 @@ export function EditarItemEstoqueDialog({ item, children }: EditarItemEstoqueDia
   useEffect(() => {
     if (item) {
       form.reset({
-        nome: item.nome,
-        categoria: item.categoria,
+        nome: item.nome || "",
+        categoria: item.categoria || "",
         descricao: item.descricao || "",
-        quantidade: item.quantidade,
-        unidade: item.unidade,
-        valorUnitario: item.valorUnitario,
-        estoqueMinimo: item.estoqueMinimo,
-        estoqueIdeal: item.estoqueIdeal
+        quantidade: item.quantidade || 0,
+        unidade: item.unidade || "",
+        valorUnitario: item.valorUnitario || 0,
+        estoqueMinimo: item.estoqueMinimo || 0,
+        estoqueIdeal: item.estoqueIdeal || 0
       });
     }
   }, [item, form]);
 
-  const onSubmit = async (data: FormValues) => {
+  const onSubmit = async (data: EditEstoqueFormValues) => {
     setIsSubmitting(true);
     
     try {
@@ -94,9 +80,9 @@ export function EditarItemEstoqueDialog({ item, children }: EditarItemEstoqueDia
         descricao: data.descricao || "",
         quantidade: data.quantidade,
         unidade: data.unidade,
-        valorUnitario: data.valorUnitario.replace(",", "."),
-        estoqueMinimo: data.estoqueMinimo,
-        estoqueIdeal: data.estoqueIdeal
+        valorUnitario: typeof data.valorUnitario === 'string' ? parseFloat(data.valorUnitario.replace(",", ".")) : data.valorUnitario,
+        estoqueMinimo: typeof data.estoqueMinimo === 'string' ? parseInt(data.estoqueMinimo) : data.estoqueMinimo,
+        estoqueIdeal: typeof data.estoqueIdeal === 'string' ? parseInt(data.estoqueIdeal) : data.estoqueIdeal
       };
       
       await apiRequest(`/api/estoque/${item.id}`, "PATCH", itemAtualizado);
@@ -177,7 +163,7 @@ export function EditarItemEstoqueDialog({ item, children }: EditarItemEstoqueDia
                 <FormItem>
                   <FormLabel>Descrição</FormLabel>
                   <FormControl>
-                    <Textarea placeholder="Descrição do item" {...field} />
+                    <Textarea placeholder="Descrição do item" {...field} value={field.value ?? ''} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>

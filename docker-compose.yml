@@ -1,0 +1,14 @@
+version: '3.8'
+
+services:
+  lanchefacil:
+    build: .
+    container_name: lanchefacil
+    ports:
+      - "5000:5000"
+    environment:
+      - NODE_ENV=production
+      - PORT=5000
+    volumes:
+      - ./data:/app/data
+    restart: unless-stopped

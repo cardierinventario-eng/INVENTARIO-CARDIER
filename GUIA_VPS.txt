@@ -1,0 +1,154 @@
+🖥️ VPS - GUIA COMPLETO
+
+========================================
+ESCOLHA A PLATAFORMA
+========================================
+
+DigitalOcean ($5/mês) ⭐⭐⭐⭐⭐
+├─ Mais barato
+├─ Mais fácil
+└─ Melhor custo-benefício
+
+AWS (grátis 1 ano) ⭐⭐⭐
+├─ Mais poderoso
+├─ Mais complexo
+└─ Grátis no primeiro ano
+
+Linode ($5/mês) ⭐⭐⭐⭐
+├─ Muito bom
+├─ Fácil
+└─ Bom suporte
+
+Vultr ($2.50/mês) ⭐⭐⭐⭐
+├─ Muito barato
+├─ Fácil
+└─ Rápido
+
+========================================
+PASSO 1: CRIAR CONTA NO DIGITALOCEAN
+========================================
+
+1. Acesse: https://digitalocean.com
+
+2. Clique "Sign up"
+
+3. Use GitHub ou Email
+
+4. Confirme email
+
+✅ Conta criada!
+
+========================================
+PASSO 2: CRIAR DROPLET (VPS)
+========================================
+
+1. Na dashboard, clique "Droplets"
+
+2. Clique "Create" → "Droplets"
+
+3. Escolha:
+   ✓ OS: Ubuntu 24.04 x64
+   ✓ Plan: Basic ($5/mês)
+   ✓ Datacenter: São Paulo (BRA)
+   ✓ Authentication: Password
+   ✓ Hostname: lanchefacil
+
+4. Clique "Create Droplet"
+
+5. Aguarde 1-2 minutos
+
+6. Você recebe um email com:
+   ✓ IP (ex: 192.168.1.1)
+   ✓ Senha root
+
+========================================
+PASSO 3: CONECTAR AO SERVIDOR
+========================================
+
+Windows PowerShell:
+──────────────────
+ssh root@seu-ip
+
+(Cole a senha quando pedir)
+
+========================================
+PASSO 4: SETUP AUTOMÁTICO
+========================================
+
+1. Na SSH, execute:
+
+wget https://github.com/seu-usuario/lanchefacil/raw/main/setup-vps.sh
+bash setup-vps.sh
+
+2. Aguarde ~5 minutos
+
+3. Pronto! App online!
+
+========================================
+PASSO 5: VERIFICAR
+========================================
+
+1. Abra: http://seu-ip:5000
+
+2. Veja seu app rodando! 🎉
+
+========================================
+GERENCIAR O SERVIDOR
+========================================
+
+Ver logs:
+────────
+docker-compose logs -f
+
+Parar app:
+──────────
+docker-compose down
+
+Reiniciar:
+──────────
+docker-compose restart
+
+Atualizar código:
+─────────────────
+cd /home/lanchefacil
+git pull origin main
+docker-compose rebuild
+docker-compose up -d
+
+========================================
+PRÓXIMOS PASSOS
+========================================
+
+1. Domínio personalizado (opcional)
+   └─ Compre em: godaddy.com, namecheap.com
+   └─ Aponte para seu IP
+
+2. SSL/HTTPS (opcional)
+   └─ Instale Nginx com SSL
+   └─ Use Let's Encrypt (gratuito)
+
+3. Backups (recomendado)
+   └─ DigitalOcean: Backups automáticos
+   └─ Custo extra: ~$1/mês
+
+========================================
+CUSTO MENSAL
+========================================
+
+Droplet 5GB: $5/mês
+Backups: $1/mês
+Domínio: ~$1/mês
+────────────────────
+Total: ~$7/mês
+
+========================================
+PRONTO!
+========================================
+
+Seu VPS está online com:
+✅ Docker
+✅ Docker Compose
+✅ Seu app LancheFácil
+✅ Banco de dados SQLite
+
+Tudo pronto para produção! 🚀

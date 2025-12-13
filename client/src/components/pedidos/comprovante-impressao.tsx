@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { type Pedido, type ItemPedido, type Mesa } from "@shared/schema";
 import { useQuery } from "@tanstack/react-query";
 import {
   Dialog,
@@ -36,19 +37,19 @@ export function ComprovanteImpressao({
   const [tipoComprovante, setTipoComprovante] = useState<string>("cozinha");
   
   // Buscar dados do pedido
-  const { data: pedido, isLoading: pedidoLoading } = useQuery({
+  const { data: pedido, isLoading: pedidoLoading } = useQuery<Pedido>({
     queryKey: ['/api/pedidos', pedidoId],
     enabled: !!pedidoId && isOpen,
   });
   
   // Buscar itens do pedido
-  const { data: itensPedido = [], isLoading: itensLoading } = useQuery({
+  const { data: itensPedido = [], isLoading: itensLoading } = useQuery<ItemPedido[]>({
     queryKey: [`/api/pedidos/${pedidoId}/itens`],
     enabled: !!pedidoId && isOpen,
   });
   
   // Buscar dados da mesa se houver
-  const { data: mesa } = useQuery({
+  const { data: mesa } = useQuery<Mesa>({
     queryKey: ['/api/mesas', mesaId],
     enabled: !!mesaId && isOpen,
   });

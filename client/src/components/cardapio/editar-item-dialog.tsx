@@ -71,7 +71,7 @@ export function EditarItemDialog({ item, categorias = [], trigger }: EditarItemD
       preco: String(item.preco || ""),
       categoria: item.categoria || "",
       categoriaId: Number(item.categoriaId || 1),
-      disponivel: Boolean(item.disponivel !== false),
+      disponivel: (item.disponivel ?? 1) !== 0,
       imagem: item.imagem || "",
     },
   });
@@ -85,7 +85,7 @@ export function EditarItemDialog({ item, categorias = [], trigger }: EditarItemD
         preco: String(item.preco || ""),
         categoria: item.categoria || "",
         categoriaId: Number(item.categoriaId || 1),
-        disponivel: Boolean(item.disponivel !== false),
+        disponivel: (item.disponivel ?? 1) !== 0,
         imagem: item.imagem || "",
       });
     }

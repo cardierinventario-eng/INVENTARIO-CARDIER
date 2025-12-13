@@ -1,0 +1,99 @@
+🖥️ VPS - RESUMO PRÁTICO
+
+========================================
+ARQUIVOS CRIADOS PARA VPS
+========================================
+
+✅ Dockerfile - Containerizar app
+✅ docker-compose.yml - Orquestração
+✅ setup-vps.sh - Script automático
+✅ GUIA_VPS.txt - Guia completo
+
+========================================
+3 PASSOS PARA COLOCAR ONLINE
+========================================
+
+PASSO 1: Criar VPS
+──────────────────
+1. digitalocean.com
+2. Sign up
+3. Create Droplet
+4. Ubuntu 24.04
+5. Plan: $5/mês
+6. Region: São Paulo
+7. Copiar IP + Senha
+
+PASSO 2: Conectar
+──────────────────
+1. PowerShell:
+   ssh root@seu-ip
+
+2. Cole a senha
+
+3. Você está no servidor!
+
+PASSO 3: Setup
+──────────────
+1. Na SSH, execute:
+
+wget https://github.com/seu-usuario/lanchefacil/raw/main/setup-vps.sh
+bash setup-vps.sh
+
+2. Aguarde 5 minutos
+
+3. Seu app está ONLINE! 🎉
+
+========================================
+VERIFICAR
+========================================
+
+Abra no navegador:
+http://seu-ip:5000
+
+Se aparecer seu app = sucesso! ✅
+
+========================================
+PRÓXIMAS VEZES
+========================================
+
+Atualizar código:
+cd /home/lanchefacil
+git pull origin main
+docker-compose restart
+
+Ver logs:
+docker-compose logs -f
+
+========================================
+CUSTO
+========================================
+
+DigitalOcean: $5/mês
+Domínio (opcional): $1/mês
+Backups (opcional): $1/mês
+
+Total: ~$5-7/mês
+
+========================================
+VANTAGENS VPS
+========================================
+
+✅ Seu próprio servidor
+✅ Controle total
+✅ Sem limites de armazenamento
+✅ Performance garantida
+✅ Domínio personalizado
+✅ Sempre online
+✅ Profissional
+
+========================================
+PRONTO PARA DEPLOY!
+========================================
+
+Tudo preparado para VPS:
+✓ Docker configurado
+✓ Script automático
+✓ Guia passo a passo
+✓ Build otimizado
+
+Pode criar o VPS agora! 🚀

@@ -2,10 +2,10 @@ import { useState, useEffect } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { type Cliente } from "@shared/schema";
+import { editClienteFormSchema, type EditClienteFormValues } from "@/lib/schemas";
 
 import {
   Dialog,
@@ -28,17 +28,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Edit } from "lucide-react";
 
-// Schema de validação para o formulário
-const formSchema = z.object({
-  nome: z.string().min(3, { message: "Nome deve ter no mínimo 3 caracteres" }),
-  email: z.string().email({ message: "Email inválido" }).or(z.string().length(0)),
-  telefone: z.string().min(10, { message: "Telefone deve ter no mínimo 10 dígitos" }),
-  endereco: z.string().optional(),
-  observacoes: z.string().optional(),
-});
-
-type FormValues = z.infer<typeof formSchema>;
-
 interface EditarClienteDialogProps {
   cliente: Cliente;
   children?: React.ReactNode;
@@ -50,12 +39,12 @@ export function EditarClienteDialog({ cliente, children }: EditarClienteDialogPr
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
-  const form = useForm<FormValues>({
-    resolver: zodResolver(formSchema),
+  const form = useForm<EditClienteFormValues>({
+    resolver: zodResolver(editClienteFormSchema),
     defaultValues: {
-      nome: cliente.nome,
+      nome: cliente.nome || "",
       email: cliente.email || "",
-      telefone: cliente.telefone,
+      telefone: cliente.telefone || "",
       endereco: cliente.endereco || "",
       observacoes: cliente.observacoes || ""
     },
@@ -65,16 +54,16 @@ export function EditarClienteDialog({ cliente, children }: EditarClienteDialogPr
   useEffect(() => {
     if (cliente) {
       form.reset({
-        nome: cliente.nome,
+        nome: cliente.nome || "",
         email: cliente.email || "",
-        telefone: cliente.telefone,
+        telefone: cliente.telefone || "",
         endereco: cliente.endereco || "",
         observacoes: cliente.observacoes || ""
       });
     }
   }, [cliente, form]);
 
-  const onSubmit = async (data: FormValues) => {
+  const onSubmit = async (data: EditClienteFormValues) => {
     setIsSubmitting(true);
     
     try {
@@ -163,7 +152,7 @@ export function EditarClienteDialog({ cliente, children }: EditarClienteDialogPr
                   <FormItem>
                     <FormLabel>Email</FormLabel>
                     <FormControl>
-                      <Input placeholder="email@exemplo.com" {...field} />
+                      <Input placeholder="email@exemplo.com" {...field} value={field.value ?? ''} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -178,7 +167,7 @@ export function EditarClienteDialog({ cliente, children }: EditarClienteDialogPr
                 <FormItem>
                   <FormLabel>Endereço</FormLabel>
                   <FormControl>
-                    <Input placeholder="Endereço completo" {...field} />
+                    <Input placeholder="Endereço completo" {...field} value={field.value ?? ''} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -192,7 +181,7 @@ export function EditarClienteDialog({ cliente, children }: EditarClienteDialogPr
                 <FormItem>
                   <FormLabel>Observações</FormLabel>
                   <FormControl>
-                    <Input placeholder="Observações adicionais" {...field} />
+                    <Input placeholder="Observações adicionais" {...field} value={field.value ?? ''} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
