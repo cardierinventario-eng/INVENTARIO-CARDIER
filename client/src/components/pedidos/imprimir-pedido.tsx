@@ -124,7 +124,7 @@ const PedidoPDF = ({ pedido, itensPedido }: any) => (
   <Document>
     <Page size="A6" style={styles.page}>
       <View style={styles.header}>
-        <Text style={styles.title}>LANCHE FÁCIL</Text>
+        <Text style={styles.title}>KARUK RESTAURANTE</Text>
         <Text style={styles.subtitle}>COMPROVANTE DE PEDIDO</Text>
       </View>
       

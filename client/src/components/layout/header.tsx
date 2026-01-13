@@ -31,13 +31,13 @@ export default function Header() {
   };
 
   return (
-    <header className="bg-gradient-to-r from-amber-800 to-amber-900 text-white shadow-lg z-10">
+    <header className="bg-gradient-to-r from-blue-900 to-blue-950 text-white shadow-lg z-10">
       <div className="flex items-center justify-between p-4">
         {/* Mobile menu button */}
         <Button 
           variant="ghost" 
           size="icon" 
-          className="md:hidden text-white hover:bg-amber-700"
+          className="md:hidden text-white hover:bg-blue-700"
           onClick={toggleSidebar}
         >
           <Menu className="h-5 w-5" />
@@ -46,11 +46,11 @@ export default function Header() {
         {/* Search */}
         <div className="relative md:w-1/3">
           <div className="relative">
-            <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-amber-200" />
+            <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-blue-200" />
             <Input 
               type="text" 
               placeholder="Buscar..." 
-              className="w-full pl-9 pr-4 py-2 border border-amber-700 rounded-lg bg-amber-50 focus:outline-none focus:border-amber-600"
+              className="w-full pl-9 pr-4 py-2 border border-blue-700 rounded-lg bg-blue-50 focus:outline-none focus:border-blue-600"
             />
           </div>
         </div>

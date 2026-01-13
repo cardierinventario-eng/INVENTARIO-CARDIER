@@ -2,24 +2,26 @@ import { Link, useLocation } from "wouter";
 import { cn } from "@/lib/utils";
 
 const menuItems = [
-  { title: "Inventário", type: "header" },
-  { title: "Inventário", icon: "fa-boxes", href: "/" },
-  { title: "Estoque", icon: "fa-warehouse", href: "/estoque" },
-  { title: "Grupos", icon: "fa-folder", href: "/grupos" },
-  { title: "Movimentações", icon: "fa-arrows-alt", href: "/movimentacoes" },
-  { title: "Fornecedores", icon: "fa-truck", href: "/fornecedores" },
+  { title: "Restaurante", type: "header" },
+  { title: "Dashboard", icon: "fa-chart-bar", href: "/" },
+  { title: "Pedidos", icon: "fa-receipt", href: "/pedidos" },
+  { title: "Mesas", icon: "fa-chair", href: "/mesas" },
+  { title: "Cardápio", icon: "fa-list", href: "/cardapio" },
+  { title: "Clientes", icon: "fa-users", href: "/clientes" },
+
+  { title: "Relatórios", type: "header" },
+  { title: "Vendas", icon: "fa-chart-line", href: "/relatorios" },
 
   { title: "Sistema", type: "header" },
   { title: "Configurações", icon: "fa-cog", href: "/configuracoes" },
-  { title: "Ajuda", icon: "fa-question-circle", href: "/ajuda" },
 ];
 
 export default function Sidebar() {
   const [location] = useLocation();
 
   return (
-    <aside className="bg-gradient-to-b from-amber-800 to-amber-900 w-64 flex-shrink-0 hidden md:block h-full overflow-y-auto shadow-lg">
-      <div className="p-4 flex items-center border-b border-amber-700">
+    <aside className="bg-gradient-to-b from-blue-900 to-blue-950 w-64 flex-shrink-0 hidden md:block h-full overflow-y-auto shadow-lg">
+      <div className="p-4 flex items-center border-b border-blue-700">
         <div className="w-10 h-10 rounded-md mr-3 bg-white/20 flex items-center justify-center text-white">
           <i className="fas fa-utensils text-xl"></i>
         </div>
@@ -31,7 +33,7 @@ export default function Sidebar() {
           if (item.type === "header") {
             return (
               <div key={index} className="px-4 mb-2 mt-6 first:mt-0">
-                <p className="text-sm text-amber-200 uppercase tracking-wider font-semibold">
+                <p className="text-sm text-blue-200 uppercase tracking-wider font-semibold">
                   {item.title}
                 </p>
               </div>

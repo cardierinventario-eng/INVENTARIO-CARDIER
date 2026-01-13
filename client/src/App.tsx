@@ -6,11 +6,12 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import NotFound from "@/pages/not-found";
 import Sidebar from "@/components/layout/sidebar";
 import Header from "@/components/layout/header";
-import Inventario from "@/pages/inventario";
-import Estoque from "@/pages/estoque";
-import Grupos from "@/pages/grupos";
-import Movimentacoes from "@/pages/movimentacoes";
-import Fornecedores from "@/pages/fornecedores";
+import Dashboard from "@/pages/dashboard";
+import Pedidos from "@/pages/pedidos";
+import Mesas from "@/pages/mesas";
+import Cardapio from "@/pages/cardapio";
+import Clientes from "@/pages/clientes";
+import Relatorios from "@/pages/relatorios";
 import Configuracoes from "@/pages/configuracoes";
 
 function Layout({ children }: { children: React.ReactNode }) {
@@ -32,27 +33,32 @@ function Router() {
     <Switch>
       <Route path="/">
         <Layout>
-          <Inventario />
+          <Dashboard />
         </Layout>
       </Route>
-      <Route path="/estoque">
+      <Route path="/pedidos">
         <Layout>
-          <Estoque />
+          <Pedidos />
         </Layout>
       </Route>
-      <Route path="/grupos">
+      <Route path="/mesas">
         <Layout>
-          <Grupos />
+          <Mesas />
         </Layout>
       </Route>
-      <Route path="/movimentacoes">
+      <Route path="/cardapio">
         <Layout>
-          <Movimentacoes />
+          <Cardapio />
         </Layout>
       </Route>
-      <Route path="/fornecedores">
+      <Route path="/clientes">
         <Layout>
-          <Fornecedores />
+          <Clientes />
+        </Layout>
+      </Route>
+      <Route path="/relatorios">
+        <Layout>
+          <Relatorios />
         </Layout>
       </Route>
       <Route path="/configuracoes">
