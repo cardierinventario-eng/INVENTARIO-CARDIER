@@ -1,4 +1,4 @@
-# 🎉 LancheFácil - Sistema de Inventário
+# �️ KARUK RESTAURANTE - Sistema de Gestão
 
 ![Status](https://img.shields.io/badge/status-ready-brightgreen)
 ![Build](https://img.shields.io/badge/build-passing-brightgreen)
@@ -8,9 +8,9 @@
 
 ## 📋 Sobre o Projeto
 
-Sistema completo de gestão de inventário e estoque para lanchonete/restaurante.
+Sistema completo de gestão de pedidos, inventário e estoque para restaurante KARUK.
 
-**Transformado de:** Lanchonete → **Sistema de Inventário**
+**Versão:** 1.0 - Sistema Completo de Restaurante
 
 ### ✨ Funcionalidades
 

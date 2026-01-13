@@ -18,12 +18,12 @@ export default function Sidebar() {
   const [location] = useLocation();
 
   return (
-    <aside className="bg-primary w-64 flex-shrink-0 hidden md:block h-full overflow-y-auto shadow-lg">
-      <div className="p-4 flex items-center border-b border-primary-dark">
+    <aside className="bg-gradient-to-b from-amber-800 to-amber-900 w-64 flex-shrink-0 hidden md:block h-full overflow-y-auto shadow-lg">
+      <div className="p-4 flex items-center border-b border-amber-700">
         <div className="w-10 h-10 rounded-md mr-3 bg-white/20 flex items-center justify-center text-white">
-          <i className="fas fa-boxes text-xl"></i>
+          <i className="fas fa-utensils text-xl"></i>
         </div>
-        <h1 className="text-white font-heading font-bold text-xl">Inventário</h1>
+        <h1 className="text-white font-heading font-bold text-lg">KARUK</h1>
       </div>
       
       <nav className="mt-5">
@@ -31,7 +31,7 @@ export default function Sidebar() {
           if (item.type === "header") {
             return (
               <div key={index} className="px-4 mb-2 mt-6 first:mt-0">
-                <p className="text-sm text-blue-200 uppercase tracking-wider font-semibold">
+                <p className="text-sm text-amber-200 uppercase tracking-wider font-semibold">
                   {item.title}
                 </p>
               </div>

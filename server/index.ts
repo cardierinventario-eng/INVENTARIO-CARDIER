@@ -12,7 +12,7 @@ const __dirname = path.dirname(__filename);
 // Verificar variáveis de ambiente
 const NODE_ENV = process.env.NODE_ENV || "development";
 const PORT = process.env.PORT || 5000;
-const DATABASE_URL = process.env.DATABASE_URL || "file:./data/lanchefacil.db";
+const DATABASE_URL = process.env.DATABASE_URL || "file:./data/karuk-restaurante.db";
 
 console.log("🚀 Starting server...");
 console.log(`📝 Environment: ${NODE_ENV}`);
@@ -603,6 +603,115 @@ app.use(express.static(publicDir));
 app.get("*", (req: Request, res: Response) => {
   const indexPath = path.join(publicDir, "index.html");
   res.sendFile(indexPath);
+});
+
+// ============================================
+// INICIAR SERVIDOR
+// ============================================
+// GET /api/relatorio/estoque-pdf - Exportar estoque em PDF
+app.get("/api/relatorio/estoque-pdf", (req: Request, res: Response) => {
+  try {
+    const PDFDocument = require("pdfkit");
+    const doc = new PDFDocument({ margin: 30 });
+    
+    // Header
+    res.setHeader("Content-Type", "application/pdf");
+    res.setHeader("Content-Disposition", "attachment; filename=relatorio-estoque.pdf");
+    
+    doc.pipe(res);
+    
+    // Título
+    doc.fontSize(20).font("Helvetica-Bold").text("RELATÓRIO DE ESTOQUE", { align: "center" });
+    doc.fontSize(10).text(`Data: ${new Date().toLocaleDateString("pt-BR")}`, { align: "center" });
+    doc.moveDown();
+    
+    // Buscar itens e movimentações
+    const itens = db.select().from(schema.itens).all();
+    const movimentacoes = db.select().from(schema.movimentacoes).all();
+    const grupos = db.select().from(schema.grupos).all();
+    
+    // Para cada grupo
+    grupos.forEach((grupo: any) => {
+      doc.fontSize(14).font("Helvetica-Bold").text(grupo.nome);
+      doc.fontSize(9).font("Helvetica");
+      
+      const itensGrupo = itens.filter((i: any) => i.grupoId === grupo.id);
+      
+      if (itensGrupo.length === 0) {
+        doc.text("Sem itens neste grupo");
+        doc.moveDown();
+        return;
+      }
+      
+      // Cabeçalho da tabela
+      const colX = { nome: 30, qtd: 200, unitario: 280, total: 350 };
+      doc.fontSize(8).font("Helvetica-Bold");
+      doc.text("Produto", colX.nome, undefined);
+      doc.text("Qtd", colX.qtd, undefined, { width: 40 });
+      doc.text("Valor Unit.", colX.unitario, undefined, { width: 50 });
+      doc.text("Total", colX.total, undefined);
+      doc.moveTo(30, doc.y).lineTo(550, doc.y).stroke();
+      doc.moveDown(5);
+      
+      // Itens
+      doc.font("Helvetica").fontSize(8);
+      itensGrupo.forEach((item: any) => {
+        const totalValor = item.quantidade * (item.valorUnitario || 0);
+        
+        // Nome do produto
+        doc.text(item.nome.substring(0, 30), colX.nome, undefined, { width: 150 });
+        const y = doc.y;
+        
+        // Quantidade
+        doc.text(item.quantidade.toFixed(2), colX.qtd, y);
+        
+        // Valor unitário
+        doc.text(`R$ ${(item.valorUnitario || 0).toFixed(2)}`, colX.unitario, y);
+        
+        // Total
+        doc.text(`R$ ${totalValor.toFixed(2)}`, colX.total, y);
+        
+        doc.moveDown(8);
+      });
+      
+      // Movimentações do grupo
+      const movGrupo = movimentacoes.filter((m: any) => 
+        itensGrupo.some((i: any) => i.id === m.itemId)
+      );
+      
+      if (movGrupo.length > 0) {
+        doc.moveDown(5);
+        doc.fontSize(9).font("Helvetica-Bold").text("Movimentações:");
+        doc.fontSize(8).font("Helvetica");
+        
+        movGrupo.forEach((mov: any) => {
+          const item = itens.find((i: any) => i.id === mov.itemId);
+          const tipo = mov.tipo === "entrada" ? "ENTRADA" : "SAÍDA";
+          const sinal = mov.tipo === "entrada" ? "+" : "-";
+          doc.text(`${mov.dataCriacao.substring(0, 10)} | ${tipo} | ${sinal}${mov.quantidade} ${item?.unidade || ""} | Motivo: ${mov.motivo || "-"}`);
+        });
+      }
+      
+      doc.moveDown(10);
+    });
+    
+    // Resumo final
+    doc.moveTo(30, doc.y).lineTo(550, doc.y).stroke();
+    doc.moveDown(5);
+    doc.fontSize(10).font("Helvetica-Bold").text("RESUMO GERAL");
+    
+    const totalItens = itens.length;
+    const totalValor = itens.reduce((sum: number, i: any) => sum + (i.quantidade * (i.valorUnitario || 0)), 0);
+    
+    doc.fontSize(9).font("Helvetica");
+    doc.text(`Total de produtos: ${totalItens}`);
+    doc.text(`Valor total em estoque: R$ ${totalValor.toFixed(2)}`);
+    
+    doc.end();
+  } catch (error) {
+    console.error("Erro ao gerar PDF:", error);
+    res.status(500).json({ error: "Erro ao gerar relatório" });
+  }
 });
 
 // ============================================

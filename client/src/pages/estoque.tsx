@@ -28,6 +28,7 @@ import {
 import { Skeleton } from "@/components/ui/skeleton";
 import { type Item } from "@shared/schema";
 import { NovoItemDialog } from "@/components/inventario/novo-item-dialog";
+import { ExportarEstoqueDialog } from "@/components/relatorios/exportar-estoque-dialog";
 import { useToast } from "@/hooks/use-toast";
 import { queryClient } from "@/lib/queryClient";
 
@@ -153,10 +154,13 @@ export default function Estoque() {
           <h1 className="text-2xl font-heading font-bold text-neutral-darkest">Estoque</h1>
           <p className="text-neutral-dark mt-1">Gerenciar entradas e saídas de produtos</p>
         </div>
-        <Button onClick={() => setItemNovo(true)} className="gap-2">
-          <Plus className="h-4 w-4" />
-          Novo Produto
-        </Button>
+        <div className="flex gap-2">
+          <ExportarEstoqueDialog />
+          <Button onClick={() => setItemNovo(true)} className="gap-2">
+            <Plus className="h-4 w-4" />
+            Novo Produto
+          </Button>
+        </div>
       </div>
 
       {/* Filtros */}
