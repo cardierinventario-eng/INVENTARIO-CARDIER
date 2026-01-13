@@ -46,7 +46,7 @@ if (Test-Path "dist") {
 
 Write-Host ""
 Write-Host "📁 Copiando para pen drive: $pendrivePath" -ForegroundColor Cyan
-Write-Host "  (Isso pode levar alguns minutos...)" -ForegroundColor Gray
+Write-Host "  `(Isso pode levar alguns minutos...`)" -ForegroundColor Gray
 
 # Copiar projeto
 $projectPath = Get-Location
